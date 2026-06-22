@@ -1,37 +1,18 @@
 <!DOCTYPE html>
 <html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>PokéAnalysis Sprint 3.1 Fix</title><link rel="stylesheet" href="css/styles.css"></head>
+<title>PokéAnalysis Sprint 4</title><link rel="stylesheet" href="css/styles.css"></head>
 <body><div class="app">
-<aside class="sidebar"><div class="brand">⚪ PokéAnalysis<span>Pro</span></div><p>Analyze. Optimize. Dominate.</p>
-<nav>
-<a href="#analyzer" class="active">Pokémon Analyzer</a>
-<a href="#typeEffectiveness">Type Effectiveness</a>
-<a href="#moveDatabase">Move Database</a>
-<a href="#competitive">Competitive</a>
-<a href="#teamBuilder">Team Builder</a>
-<a href="#resources">Resources</a>
-</nav>
-<div class="about"><strong>About</strong><p>Class project demo with live Pokémon data, type analysis, moves, Mega Evolutions, gender info, and competitive suggestions.</p></div></aside>
+<aside class="sidebar"><div class="brand">⚪ PokéAnalysis<span>Pro</span></div><p>Team Builder Edition</p>
+<nav><a href="#analyzer" class="active">Pokémon Analyzer</a><a href="#teamBuilder">Team Builder</a><a href="#teamAnalysis">Team Analysis</a><a href="#moveDatabase">Move Database</a><a href="#exports">Exports</a><a href="#resources">Resources</a></nav>
+<div class="about"><strong>Sprint 4</strong><p>Add Pokémon to a 6-member team, analyze shared weaknesses, and export your team.</p></div></aside>
 <main class="main" id="analyzer">
-<header class="topbar"><div class="search-wrap"><input id="pokemonSearch" placeholder="Search Pokémon..." autocomplete="off"><div id="suggestions" class="suggestions hidden"></div></div><button id="searchButton">Analyze</button>
-<label class="toggle"><span>Shiny</span><input id="shinyToggle" type="checkbox"><b></b><small id="shinyStatus">OFF</small></label></header>
+<header class="topbar"><div class="search-wrap"><input id="pokemonSearch" placeholder="Search Pokémon..." autocomplete="off"><div id="suggestions" class="suggestions hidden"></div></div><button id="searchButton">Analyze</button><button id="addTeamBtn">Add to Team</button><button id="themeToggle" class="theme-toggle" type="button">☀️ Light</button><label class="toggle"><span>Shiny</span><input id="shinyToggle" type="checkbox"><b></b><small id="shinyStatus">OFF</small></label></header>
 <div id="loading" class="loading hidden">Loading Pokémon data...</div><div id="errorBox" class="error hidden"></div>
-<section class="grid top-grid">
-<article class="card hero-card"><img id="officialArtwork" alt="Pokémon artwork"><div class="hero-info"><span id="dexNumber"></span><h1 id="pokemonName">Search Pokémon</h1><div id="typeBadges" class="badges"></div><p id="species"></p><p id="height"></p><p id="weight"></p></div></article>
-<article class="card"><h2>Base Stats</h2><div id="stats"></div><h3>Total <span id="bst">0</span></h3></article>
-<article class="card"><h2>Abilities</h2><div id="abilities"></div></article>
-<article class="card"><h2>Forms & Mega Evolutions</h2><div id="formsPanel"></div><div id="megaPanel"></div></article>
-</section>
-<section class="grid mid-grid">
-<article class="card" id="typeEffectiveness"><h2>Type Effectiveness</h2><p class="muted">Defensive matchups calculated from the Pokémon's type combination.</p><div id="typeMatchups" class="matchups detailed-matchups"></div></article>
-<article class="card" id="competitive"><h2>Competitive Analysis</h2><div id="competitivePanel"></div></article>
-<article class="card"><h2>Gender Differences</h2><div id="genderPanel"></div></article>
-</section>
-<section class="grid move-grid" id="moveDatabase">
-<article class="card move-table-card"><h2>Move Database</h2><div class="filters"><input id="moveSearch" placeholder="Search moves..."><select id="typeFilter"><option value="">All Types</option></select><select id="categoryFilter"><option value="">All Categories</option></select></div><div class="table-wrap"><table><thead><tr><th>Move</th><th>Type</th><th>Category</th><th>Power</th><th>Accuracy</th><th>PP</th></tr></thead><tbody id="movesBody"></tbody></table></div></article>
-<article class="card"><h2>Move Details</h2><div id="moveDetails">Select a move to view details.</div></article>
-</section>
-<section class="card" id="teamBuilder"><h2>Team Builder</h2><p class="muted">Team Builder will be completed in Sprint 4. This section is included so the sidebar link works for the class demo roadmap.</p></section>
-<section class="card" id="resources"><h2>Resources</h2><p class="muted">Data source: PokéAPI. Future resources will include matchup notes, nature guide, EV/IV guide, and competitive references.</p></section>
-<footer>PokéAnalysis Sprint 3.1 Fix · GitHub Pages Ready · Data from PokéAPI</footer></main></div>
-<script src="js/utils.js"></script><script src="js/typeChart.js"></script><script src="js/megaData.js"></script><script src="js/competitive.js"></script><script src="js/api.js"></script><script src="js/ui.js"></script><script src="js/app.js"></script></body></html>
+<section class="grid top-grid"><article class="card hero-card"><img id="officialArtwork" alt="Pokémon artwork"><div><span id="dexNumber"></span><h1 id="pokemonName">Search Pokémon</h1><div id="typeBadges" class="badges"></div><p id="species"></p><p id="height"></p><p id="weight"></p></div></article><article class="card"><h2>Base Stats</h2><div id="stats"></div><h3>Total <span id="bst">0</span></h3></article><article class="card"><h2>Abilities</h2><div id="abilities"></div></article><article class="card"><h2>Forms & Mega Evolutions</h2><div id="formsPanel"></div><div id="megaPanel"></div></article></section>
+<section class="grid mid-grid"><article class="card" id="typeEffectiveness"><h2>Type Effectiveness</h2><div id="typeMatchups" class="matchups detailed-matchups"></div></article><article class="card" id="competitive"><h2>Competitive Analysis</h2><div id="competitivePanel"></div></article><article class="card"><h2>Gender Differences</h2><div id="genderPanel"></div></article></section>
+<section class="card" id="teamBuilder"><div class="card-head"><h2>Team Builder</h2><span id="teamCount" class="score-pill">0 / 6</span></div><p class="muted">Search a Pokémon, then click <strong>Add to Team</strong>. Build up to six Pokémon.</p><div id="teamSlots" class="team-grid"></div><div class="team-buttons"><button id="clearTeamBtn">Clear Team</button><button id="saveTeamBtn">Save Team</button><button id="loadTeamBtn">Load Saved Team</button></div></section>
+<section class="grid analysis-grid" id="teamAnalysis"><article class="card"><h2>Team Synergy Score</h2><div id="teamScore" class="big-score">—</div><div id="teamSummary"></div></article><article class="card"><h2>Shared Weaknesses</h2><div id="teamWeaknesses" class="matchups"></div></article><article class="card"><h2>Team Stats</h2><div id="teamStats"></div></article><article class="card"><h2>Role Balance</h2><div id="teamRoles"></div></article></section>
+<section class="grid move-grid" id="moveDatabase"><article class="card move-table-card"><h2>Move Database</h2><div class="filters"><input id="moveSearch" placeholder="Search moves..."><select id="typeFilter"><option value="">All Types</option></select><select id="categoryFilter"><option value="">All Categories</option></select></div><div class="table-wrap"><table><thead><tr><th>Move</th><th>Type</th><th>Category</th><th>Power</th><th>Accuracy</th><th>PP</th></tr></thead><tbody id="movesBody"></tbody></table></div></article><article class="card"><h2>Move Details</h2><div id="moveDetails">Select a move to view details.</div></article></section>
+<section class="card" id="exports"><h2>Exports</h2><div class="team-buttons"><button id="csvBtn">Export CSV</button><button id="jsonBtn">Export JSON</button><button id="showdownBtn">Export Showdown</button></div><textarea id="exportOutput" placeholder="Export output appears here." readonly></textarea></section>
+<section class="card" id="resources"><h2>Resources</h2><p class="muted">Future resources: nature guide, EV/IV planner, Tera type advice, and damage calculator.</p></section><footer>PokéAnalysis Sprint 4 · Team Builder Demo · Data from PokéAPI</footer></main></div>
+<script src="js/utils.js"></script><script src="js/typeChart.js"></script><script src="js/megaData.js"></script><script src="js/competitive.js"></script><script src="js/api.js"></script><script src="js/ui.js"></script><script src="js/teamBuilder.js"></script><script src="js/app.js"></script></body></html>
