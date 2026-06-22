@@ -222,3 +222,42 @@ body.light{--bg:#eef3fb;--panel:#ffffff;--panel2:#f4f7fb;--line:#cdd8e8;--text:#
 .damage-line{
   margin:.4rem 0;
 }
+
+
+/* ===== Sprint 5.5 Battle Planner ===== */
+.battle-plan-result{
+  background:var(--panel2);
+  border:1px solid var(--line);
+  border-radius:12px;
+  padding:14px;
+  margin-top:12px;
+}
+.battle-team-card{
+  background:var(--panel);
+  border:1px solid var(--line);
+  border-radius:10px;
+  padding:10px;
+  margin:8px 0;
+}
+.battle-team-card img{
+  width:64px;
+  height:64px;
+  object-fit:contain;
+}
+.battle-team-head{
+  display:flex;
+  gap:10px;
+  align-items:center;
+}
+.threat-high{
+  color:#ff7171;
+  font-weight:900;
+}
+.threat-medium{
+  color:var(--yellow);
+  font-weight:900;
+}
+.threat-low{
+  color:#64e87b;
+  font-weight:900;
+}

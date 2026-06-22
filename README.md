@@ -1,18 +1,18 @@
-# PokéAnalysis Sprint 5.3
+# PokéAnalysis Sprint 5.5
 
-Clean replacement build.
+Battle Planner build.
 
-## New in Sprint 5.3
-- Added simplified Damage Calculator.
-- Uses current searched Pokémon as attacker.
-- Lets user choose an attacking move.
-- Lets user load a defender Pokémon.
-- Includes weather: Sun and Rain.
-- Includes screens: Reflect and Light Screen.
-- Includes critical hit toggle.
-- Shows estimated damage percentage, HP damage range, STAB, type multiplier, and KO guidance.
+## New in Sprint 5.5
+- Opponent Team Builder
+- Add/remove opponent Pokémon
+- Compare your team against an opponent team
+- Top opponent threat scoring
+- Recommended lead suggestions
+- Speed issue detection
+- Battle notes
+- Win condition ideas
 
-## Note
-This is a simplified class-project damage calculator, not a full Pokémon Showdown damage engine.
+## What Sprint 5.5 means
+Sprint 5.5 is not a full battle simulator. It is a battle planning tool that helps you prepare for matchups by comparing teams and surfacing threats, leads, and strategic concerns.
 
-Upload extracted files to GitHub and replace the old files.
+Upload extracted files to GitHub and replace old files.

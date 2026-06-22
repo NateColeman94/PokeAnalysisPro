@@ -185,6 +185,7 @@ function renderTeam(){
     </div>`;
   }).join("")||"<p class='muted'>No Pokémon on the team yet.</p>";
   renderTeamAnalysis();
+  renderBattleTeams();
 }
 function renderTeamAnalysis(){
   if(!team.length){
@@ -444,7 +445,146 @@ function estimateDefenderStat(base,level){
   return Math.floor(((2*base+31+Math.floor(0/4))*level)/100)+5;
 }
 
+
+let opponentTeam=[];
+
+function renderBattleTeams(){
+  const your=id("battleYourTeam");
+  const opp=id("opponentTeamSlots");
+  if(your){
+    your.innerHTML=team.length?team.map(p=>battleCard(p)).join(""):"Add Pokémon to your team first.";
+  }
+  if(opp){
+    opp.innerHTML=opponentTeam.length?opponentTeam.map((p,i)=>battleCard(p,`<button class="remove-btn" onclick="removeOpponent(${i})">Remove</button>`)).join(""):"No opponent Pokémon added yet.";
+  }
+}
+
+function battleCard(p,extra=""){
+  return `<div class="battle-team-card">
+    <div class="battle-team-head">
+      <img src="${p.artwork}">
+      <div>
+        <strong>${p.displayName}</strong>
+        <div>${p.types.map(badge).join("")}</div>
+        <small>${p.role || roleOf(p)} · Speed ${p.evIvNature?.finalStats?.speed || p.stats.speed}</small>
+      </div>
+    </div>
+    ${extra}
+  </div>`;
+}
+
+async function addOpponent(){
+  const input=id("opponentInput");
+  const name=input?.value || "";
+  if(!name.trim()){
+    alert("Enter an opponent Pokémon.");
+    return;
+  }
+  if(opponentTeam.length>=6){
+    alert("Opponent team is full.");
+    return;
+  }
+  try{
+    const p=await fetchPokemon(name);
+    opponentTeam.push(p);
+    input.value="";
+    renderBattleTeams();
+  }catch(e){
+    alert("Could not load opponent Pokémon.");
+  }
+}
+
+function removeOpponent(i){
+  opponentTeam.splice(i,1);
+  renderBattleTeams();
+}
+
+function clearOpponentTeam(){
+  opponentTeam=[];
+  renderBattleTeams();
+}
+
+function battleTypeScore(attacker, defender){
+  let best=1;
+  (attacker.moves||[]).filter(m=>m.power).slice(0,40).forEach(m=>{
+    const eff=typeEffectiveness(m.type,defender.types);
+    if(eff>best) best=eff;
+  });
+  return best;
+}
+
+function defensiveThreatScore(opponent){
+  let score=0;
+  team.forEach(ally=>{
+    const m=matchup(ally.types);
+    opponent.types.forEach(t=>{
+      if(m["4x"].includes(t)) score+=3;
+      else if(m["2x"].includes(t)) score+=2;
+      else if(m["0.5x"].includes(t) || m["0.25x"].includes(t) || m["0x"].includes(t)) score-=1;
+    });
+  });
+  return score;
+}
+
+function analyzeBattle(){
+  renderBattleTeams();
+  const out=id("battlePlanResult");
+  if(!team.length || !opponentTeam.length){
+    out.innerHTML="Add at least one Pokémon to your team and one opponent Pokémon.";
+    return;
+  }
+
+  const opponentThreats=opponentTeam.map(o=>{
+    const speed=o.stats.speed;
+    const fasterThan=team.filter(p=>(p.evIvNature?.finalStats?.speed || p.stats.speed) < speed).length;
+    const defensiveScore=defensiveThreatScore(o);
+    const coverageAgainstUs=team.reduce((sum,p)=>sum+battleTypeScore(o,p),0);
+    const total=Math.round(defensiveScore + coverageAgainstUs + fasterThan);
+    return {pokemon:o,total,fasterThan,coverageAgainstUs,defensiveScore};
+  }).sort((a,b)=>b.total-a.total);
+
+  const leadCandidates=team.map(p=>{
+    const speed=p.evIvNature?.finalStats?.speed || p.stats.speed;
+    const hits=opponentTeam.reduce((sum,o)=>sum+battleTypeScore(p,o),0);
+    const weakToOpp=opponentTeam.reduce((sum,o)=>{
+      const m=matchup(p.types);
+      return sum+o.types.reduce((s,t)=>s+(m["4x"].includes(t)?2:m["2x"].includes(t)?1:0),0);
+    },0);
+    return {pokemon:p,score:Math.round(speed/20 + hits*4 - weakToOpp*2)};
+  }).sort((a,b)=>b.score-a.score).slice(0,3);
+
+  const speedIssues=opponentTeam.filter(o=>{
+    const oppSpeed=o.stats.speed;
+    return !team.some(p=>(p.evIvNature?.finalStats?.speed || p.stats.speed) >= oppSpeed);
+  });
+
+  const matchupNotes=[];
+  opponentThreats.slice(0,3).forEach(t=>{
+    const label=t.total>=18?"High":t.total>=11?"Medium":"Low";
+    matchupNotes.push(`<p><span class="${label==="High"?"threat-high":label==="Medium"?"threat-medium":"threat-low"}">${label} Threat:</span> ${t.pokemon.displayName}</p>`);
+  });
+  if(speedIssues.length){
+    matchupNotes.push(`<p class="bad">Speed issue: Your team may be slower than ${speedIssues.map(x=>x.displayName).join(", ")}.</p>`);
+  }else{
+    matchupNotes.push(`<p class="good">Speed control looks acceptable against this opponent team.</p>`);
+  }
+
+  out.innerHTML=`
+    <h3>Top Opponent Threats</h3>
+    ${opponentThreats.slice(0,6).map(t=>`<div class="mini-card"><strong>${t.pokemon.displayName}</strong><p>Threat Score: ${t.total}</p><div>${t.pokemon.types.map(badge).join("")}</div></div>`).join("")}
+
+    <h3>Recommended Leads</h3>
+    ${leadCandidates.map(l=>`<div class="mini-card"><strong>${l.pokemon.displayName}</strong><p>Lead Score: ${l.score}</p><div>${l.pokemon.types.map(badge).join("")}</div></div>`).join("")}
+
+    <h3>Battle Notes</h3>
+    ${matchupNotes.join("")}
+
+    <h3>Win Condition Ideas</h3>
+    <p>Look for setup or pressure from your strongest offensive role Pokémon: ${team.filter(p=>["Physical Sweeper","Special Sweeper","Mixed Attacker"].includes(p.role)).map(p=>p.displayName).join(", ") || "No clear sweeper identified"}.</p>
+  `;
+}
+
 document.addEventListener("DOMContentLoaded",()=>{id("searchButton").onclick=()=>runSearch(id("pokemonSearch").value);id("pokemonSearch").onkeydown=e=>{if(e.key==="Enter")runSearch(id("pokemonSearch").value)};id("pokemonSearch").oninput=suggest;id("addTeamBtn").onclick=addToTeam;id("clearTeamBtn").onclick=clearTeam;id("saveTeamBtn").onclick=saveTeam;id("loadTeamBtn").onclick=loadTeam;id("csvBtn").onclick=exportCSV;id("jsonBtn").onclick=exportJSON;id("showdownBtn").onclick=exportShowdown;if(id("resetCustomBtn"))id("resetCustomBtn").onclick=resetCustomInputs;id("moveSearch").oninput=applyMoveFilters;id("typeFilter").onchange=applyMoveFilters;id("categoryFilter").onchange=applyMoveFilters;id("shinyToggle").onchange=()=>{id("shinyStatus").textContent=id("shinyToggle").checked?"ON":"OFF";if(currentPokemon)id("officialArtwork").src=id("shinyToggle").checked&&currentPokemon.shiny?currentPokemon.shiny:currentPokemon.artwork};id("themeToggle").onclick=()=>{document.body.classList.toggle("light");id("themeToggle").textContent=document.body.classList.contains("light")?"🌙 Dark":"☀️ Light"};
 ["calcLevel","natureSelect","evHP","evAttack","evDefense","evSpA","evSpD","evSpeed"].forEach(x=>{if(id(x)){id(x).oninput=calculateFinalStats;id(x).onchange=calculateFinalStats;}});
 if(id("resetEvIvBtn"))id("resetEvIvBtn").onclick=resetEvIvBuilder;
-if(id("loadDefenderBtn"))id("loadDefenderBtn").onclick=loadDamageDefender;if(id("calculateDamageBtn"))id("calculateDamageBtn").onclick=calculateSimplifiedDamage;runSearch("charizard");renderTeam()});
+if(id("loadDefenderBtn"))id("loadDefenderBtn").onclick=loadDamageDefender;if(id("calculateDamageBtn"))id("calculateDamageBtn").onclick=calculateSimplifiedDamage;if(id("addOpponentBtn"))id("addOpponentBtn").onclick=addOpponent;if(id("clearOpponentBtn"))id("clearOpponentBtn").onclick=clearOpponentTeam;if(id("analyzeBattleBtn"))id("analyzeBattleBtn").onclick=analyzeBattle;runSearch("charizard");renderBattleTeams();renderTeam()});

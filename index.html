@@ -3,14 +3,14 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>PokéAnalysis Sprint 5.3</title>
+  <title>PokéAnalysis Sprint 5.5</title>
   <link rel="stylesheet" href="css/styles.css" />
 </head>
 <body>
 <div class="app">
   <aside class="sidebar">
     <div class="brand">⚪ PokéAnalysis<span>Pro</span></div>
-    <p>Sprint 5.3 · Damage Calculator</p>
+    <p>Sprint 5.5 · Battle Planner</p>
     <nav>
       <a href="#pokemonOverview" class="active">Pokémon Overview</a>
       <a href="#pokedexRow">Pokédex Entry</a>
@@ -22,6 +22,7 @@
       <a href="#evIvBuilder">EV + Nature Builder</a>
       <a href="#customTeamInputs">Custom Team Inputs</a>
       <a href="#damageCalculator">Damage Calculator</a>
+      <a href="#battlePlanner">Battle Planner</a>
       <a href="#teamBuilder">Team Builder</a>
       <a href="#teamAnalysis">Team Analysis</a>
       <a href="#moveDatabase">Move Database</a>
@@ -189,6 +190,35 @@
       <div id="damageResult" class="damage-result">Choose a move, load a defender, then calculate damage.</div>
     </section>
 
+    
+    <section class="card" id="battlePlanner">
+      <h2>Battle Planner</h2>
+      <p class="muted">Compare your saved team against an opponent team. This planner estimates threats, leads, speed problems, and matchup notes.</p>
+
+      <div class="custom-grid custom-grid-small">
+        <label>Opponent Pokémon <input id="opponentInput" placeholder="e.g. garchomp"></label>
+        <button id="addOpponentBtn" type="button">Add Opponent</button>
+        <button id="clearOpponentBtn" type="button">Clear Opponent Team</button>
+        <button id="analyzeBattleBtn" type="button">Analyze Battle</button>
+      </div>
+
+      <div class="grid two-col">
+        <article class="mini-card">
+          <h3>Your Team</h3>
+          <div id="battleYourTeam">Add Pokémon to your team first.</div>
+        </article>
+        <article class="mini-card">
+          <h3>Opponent Team</h3>
+          <div id="opponentTeamSlots">No opponent Pokémon added yet.</div>
+        </article>
+      </div>
+
+      <div id="battlePlanResult" class="battle-plan-result">
+        Add your team and opponent Pokémon, then click Analyze Battle.
+      </div>
+    </section>
+
+
     <section class="card" id="teamBuilder">
       <div class="card-head">
         <h2>Team Builder</h2>
@@ -257,7 +287,7 @@
       <textarea id="exportOutput" placeholder="Export output appears here." readonly></textarea>
     </section>
 
-    <footer>PokéAnalysis Sprint 5.3 · EV + Nature Builder · Data from PokéAPI</footer>
+    <footer>PokéAnalysis Sprint 5.5 · EV + Nature Builder · Data from PokéAPI</footer>
   </main>
 </div>
 <script src="js/app.js"></script>
