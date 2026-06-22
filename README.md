@@ -1,19 +1,8 @@
-# PokéAnalysis Sprint 4
+# PokéAnalysis Sprint 4 Fixed Final
 
-GitHub-ready Team Builder demo.
+Fixes:
+- Dark/light toggle is visible in the top bar and defaults to dark.
+- Team Builder is wired directly and works with Add to Team, Remove, Save, Load, and exports.
+- Uses a single app.js file to reduce missing-file issues on GitHub Pages.
 
-## New in Sprint 4
-- Six-Pokémon team builder
-- Add/remove team members
-- Save/load team locally
-- Team weakness summary
-- Team role balance
-- Team synergy score
-- Team stat dashboard
-- CSV, JSON, and Showdown-style exports
-
-Upload extracted files to GitHub. Keep the css and js folders intact.
-
-## Update
-- Restored dark/light theme toggle.
-- Dark mode remains the default.
+Upload extracted files to GitHub and keep css/styles.css and js/app.js in their folders.
