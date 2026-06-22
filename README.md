@@ -15,3 +15,13 @@ Upload the extracted contents to GitHub. Replace the old index.html, css folder,
 - Added evolution requirement display such as level, item, trade, friendship, held item, known move, time of day, and location when available.
 - Added Mega Evolution notes inside the Evolution Chain section.
 - Fixed generation formatting so Gen II displays correctly instead of Gen Ii.
+
+## Sprint 5.1 Advanced Team Analysis
+- Moved Evolution Chain directly under the Pokédex Entry area.
+- Added custom Pokémon/team inputs for HP, Attack, Defense, Sp. Attack, Sp. Defense, Speed.
+- Added selected ability input, including hidden ability choices.
+- Added held item input.
+- Add to Team now stores the custom stats, selected ability, and held item.
+- Added Type Coverage Score, Defensive Coverage Score, Role Balance Score, and Speed Control Score.
+- Added team suggestions based on weak spots.
+- Improved exports to include ability and held item.

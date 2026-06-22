@@ -64,7 +64,7 @@ function itemOf(p){let r=roleOf(p);if(p.types.includes("fire")&&p.types.includes
 function matchup(types){let g={"4x":[],"2x":[],"1x":[],"0.5x":[],"0.25x":[],"0x":[]};TYPES.forEach(a=>{let m=types.reduce((x,d)=>x*((CHART[a]&&CHART[a][d]!==undefined)?CHART[a][d]:1),1);if(m===4)g["4x"].push(a);else if(m===2)g["2x"].push(a);else if(m===1)g["1x"].push(a);else if(m===.5)g["0.5x"].push(a);else if(m===.25)g["0.25x"].push(a);else if(m===0)g["0x"].push(a)});return g}
 async function fetchPokemon(term){let r=await fetch(`${API_BASE}/pokemon/${norm(term)}`);if(!r.ok)throw new Error("Pokémon not found.");let p=await r.json();let sr=await fetch(p.species.url);let sp=sr.ok?await sr.json():{};let abilities=await Promise.all(p.abilities.map(async e=>{let d="No description available.";let ar=await fetch(e.ability.url);if(ar.ok){let a=await ar.json();let eff=a.effect_entries.find(x=>x.language.name==="en");if(eff)d=eff.short_effect}return{name:e.ability.name,hidden:e.is_hidden,description:d}}));let moves=await Promise.all(p.moves.slice(0,80).map(async e=>{let mr=await fetch(e.move.url);if(!mr.ok)return null;let m=await mr.json();let eff=m.effect_entries.find(x=>x.language.name==="en");return{name:m.name,type:m.type.name,category:m.damage_class.name,power:m.power,accuracy:m.accuracy,pp:m.pp,description:eff?eff.short_effect:""}}));let stats={};p.stats.forEach(x=>stats[x.stat.name]=x.base_stat);let flavor=sp.flavor_text_entries?.find(x=>x.language.name==="en"),genus=sp.genera?.find(x=>x.language.name==="en");let gr=sp.gender_rate,gender="Unknown";if(gr===-1)gender="Genderless";else if(gr!==undefined){let f=gr*12.5;gender=`Male ${(100-f).toFixed(1)}% / Female ${f.toFixed(1)}%`}const evolutionChain=await fetchEvolutionChain(sp);let obj={id:p.id,name:p.name,displayName:title(p.name),artwork:p.sprites.other?.["official-artwork"]?.front_default||p.sprites.front_default,shiny:p.sprites.other?.["official-artwork"]?.front_shiny||p.sprites.front_shiny,types:p.types.map(x=>x.type.name),height:p.height,weight:p.weight,species:genus?.genus||"Unknown Pokémon",description:clean(flavor?.flavor_text||""),generation:sp.generation?formatGeneration(sp.generation.name):"Unknown",habitat:sp.habitat?title(sp.habitat.name):"Unknown",captureRate:sp.capture_rate??"Unknown",baseFriendship:sp.base_happiness??"Unknown",hatchSteps:sp.hatch_counter!==undefined?sp.hatch_counter*255:"Unknown",legendary:sp.is_legendary?"Yes":"No",mythical:sp.is_mythical?"Yes":"No",stats:{hp:stats.hp||0,attack:stats.attack||0,defense:stats.defense||0,specialAttack:stats["special-attack"]||0,specialDefense:stats["special-defense"]||0,speed:stats.speed||0},abilities,moves:moves.filter(Boolean),genderText:gender,hasGenderDifferences:sp.has_gender_differences||false,evolutionChain};obj.role=roleOf(obj);return obj}
 async function runSearch(v){id("errorBox").classList.add("hidden");id("loading").classList.remove("hidden");try{render(await fetchPokemon(v))}catch(e){id("errorBox").textContent=e.message;id("errorBox").classList.remove("hidden")}finally{id("loading").classList.add("hidden")}}
-function render(p){currentPokemon=p;currentMoves=p.moves;id("officialArtwork").src=id("shinyToggle").checked&&p.shiny?p.shiny:p.artwork;id("pokemonName").textContent=p.displayName;id("dexNumber").textContent="#"+String(p.id).padStart(4,"0");id("typeBadges").innerHTML=p.types.map(badge).join("");id("species").textContent=p.species;id("height").textContent="Height: "+(p.height/10).toFixed(1)+" m";id("weight").textContent="Weight: "+(p.weight/10).toFixed(1)+" kg";renderDex(p);renderEvolution(p);renderStats(p);renderAbilities(p);renderTypes(p);renderForms(p);renderGender(p);renderComp(p);renderMoveFilters(p.moves);renderMoves(p.moves)}
+function render(p){currentPokemon=p;currentMoves=p.moves;id("officialArtwork").src=id("shinyToggle").checked&&p.shiny?p.shiny:p.artwork;id("pokemonName").textContent=p.displayName;id("dexNumber").textContent="#"+String(p.id).padStart(4,"0");id("typeBadges").innerHTML=p.types.map(badge).join("");id("species").textContent=p.species;id("height").textContent="Height: "+(p.height/10).toFixed(1)+" m";id("weight").textContent="Weight: "+(p.weight/10).toFixed(1)+" kg";renderDex(p);renderEvolution(p);renderStats(p);renderAbilities(p);renderTypes(p);renderForms(p);renderGender(p);renderComp(p);renderCustomInputs(p);renderMoveFilters(p.moves);renderMoves(p.moves)}
 
 function renderEvolution(p){
   const container=id("evolutionChain");
@@ -95,16 +95,142 @@ function renderMoveFilters(m){id("typeFilter").innerHTML='<option value="">All T
 function renderMoves(m){filteredMoves=m;id("movesBody").innerHTML=m.map((x,i)=>`<tr class="move-row" onclick="showMove(${i})"><td>${title(x.name)}</td><td>${badge(x.type)}</td><td>${x.category}</td><td>${x.power??"—"}</td><td>${x.accuracy??"—"}</td><td>${x.pp??"—"}</td></tr>`).join("");showMove(0)}
 function showMove(i){let m=filteredMoves[i];if(!m)return;id("moveDetails").innerHTML=`<h2>${title(m.name)}</h2>${badge(m.type)}<p>Category: ${m.category}</p><p>Power: ${m.power??"—"}</p><p>Accuracy: ${m.accuracy??"—"}</p><p>PP: ${m.pp??"—"}</p><p>${m.description}</p>`}
 function applyMoveFilters(){let q=id("moveSearch").value.toLowerCase(),t=id("typeFilter").value,c=id("categoryFilter").value;renderMoves(currentMoves.filter(m=>(!q||m.name.includes(q))&&(!t||m.type===t)&&(!c||m.category===c)))}
-function addToTeam(){if(!currentPokemon)return;if(team.length>=6){alert("Team is full.");return}team.push(currentPokemon);renderTeam()}
+
+function renderCustomInputs(p){
+  const abilitySelect=id("customAbility");
+  if(!abilitySelect) return;
+  abilitySelect.innerHTML=(p.abilities||[]).map(a=>`<option value="${a.name}">${title(a.name)}${a.hidden?" (Hidden)":""}</option>`).join("");
+  const preferred=p.abilities.find(a=>a.hidden)?.name || p.abilities[0]?.name || "";
+  abilitySelect.value=preferred;
+  ["customHP","customAttack","customDefense","customSpA","customSpD","customSpeed"].forEach(x=>{ if(id(x)) id(x).value=""; });
+  if(id("customItem")) id("customItem").value=itemOf(p);
+}
+function resetCustomInputs(){
+  ["customHP","customAttack","customDefense","customSpA","customSpD","customSpeed"].forEach(x=>{ if(id(x)) id(x).value=""; });
+  if(currentPokemon) renderCustomInputs(currentPokemon);
+}
+function teamReadyPokemon(){
+  if(!currentPokemon) return null;
+  const p=JSON.parse(JSON.stringify(currentPokemon));
+  const map=[
+    ["customHP","hp"],["customAttack","attack"],["customDefense","defense"],
+    ["customSpA","specialAttack"],["customSpD","specialDefense"],["customSpeed","speed"]
+  ];
+  map.forEach(([input,stat])=>{
+    const val=parseInt(id(input)?.value||"",10);
+    if(!Number.isNaN(val) && val>0) p.stats[stat]=val;
+  });
+  p.customAbility=id("customAbility")?.value || p.abilities[0]?.name || "Unknown";
+  p.heldItem=id("customItem")?.value || itemOf(p);
+  p.role=roleOf(p);
+  return p;
+}
+function offensiveCoverageScore(){
+  if(!team.length) return 0;
+  const covered=new Set();
+  team.forEach(p=>{
+    (p.moves||[]).filter(m=>m.power).slice(0,30).forEach(m=>{
+      TYPES.forEach(def=>{
+        const mult=(CHART[m.type]&&CHART[m.type][def]!==undefined)?CHART[m.type][def]:1;
+        if(mult>1) covered.add(def);
+      });
+    });
+  });
+  return Math.round((covered.size/TYPES.length)*100);
+}
+function defensiveCoverageScore(){
+  if(!team.length) return 0;
+  let sharedWeak=0, resistCount=0;
+  const weakCounts={};
+  team.forEach(p=>{
+    const m=matchup(p.types);
+    [...m["4x"],...m["2x"]].forEach(t=>weakCounts[t]=(weakCounts[t]||0)+1);
+    resistCount += [...m["0.5x"],...m["0.25x"],...m["0x"]].length;
+  });
+  sharedWeak=Object.values(weakCounts).filter(v=>v>=3).length;
+  return Math.max(30, Math.min(100, Math.round(70 + resistCount - sharedWeak*15)));
+}
+function roleBalanceScore(){
+  if(!team.length) return 0;
+  const roles=new Set(team.map(p=>p.role));
+  return Math.min(100, Math.round((roles.size/5)*100));
+}
+function speedControlScore(){
+  if(!team.length) return 0;
+  const fast=team.filter(p=>p.stats.speed>=100).length;
+  const mid=team.filter(p=>p.stats.speed>=80 && p.stats.speed<100).length;
+  return Math.min(100, Math.round(fast*28 + mid*12));
+}
+function teamSuggestions(scores, weakCounts, roles){
+  const suggestions=[];
+  if(scores.type<65) suggestions.push("Add broader move coverage so the team can hit more types effectively.");
+  if(scores.defense<70) suggestions.push("Reduce stacked weaknesses or add Pokémon that resist common threats.");
+  if(scores.role<70) suggestions.push("Add more role variety, such as a tank, wall, or utility Pokémon.");
+  if(scores.speed<65) suggestions.push("Add a faster Pokémon, Choice Scarf user, or priority attacker.");
+  Object.entries(weakCounts).filter(([,c])=>c>=3).forEach(([t,c])=>suggestions.push(`${c} team members are weak to ${title(t)}.`));
+  if(!roles["Defensive Tank"] && !roles["Wall"]) suggestions.push("Consider adding a defensive backbone.");
+  return suggestions.length?suggestions:["Team has a solid basic structure for this demo scoring model."];
+}
+
+function addToTeam(){const p=teamReadyPokemon();if(!p)return;if(team.length>=6){alert("Team is full.");return}team.push(p);renderTeam()}
 function removeTeam(i){team.splice(i,1);renderTeam()}
 function clearTeam(){team=[];renderTeam()}
 function saveTeam(){localStorage.setItem("pokeTeam",JSON.stringify(team.map(p=>p.name)));alert("Team saved.")}
 async function loadTeam(){let names=JSON.parse(localStorage.getItem("pokeTeam")||"[]");team=[];for(let n of names){try{team.push(await fetchPokemon(n))}catch(e){}}renderTeam()}
-function renderTeam(){id("teamCount").textContent=`${team.length} / 6`;id("teamSlots").innerHTML=team.map((p,i)=>`<div class="team-slot"><img src="${p.artwork}"><h3>${p.displayName}</h3><div>${p.types.map(badge).join("")}</div><p>${p.role}</p><button class="remove-btn" onclick="removeTeam(${i})">Remove</button></div>`).join("")||"<p class='muted'>No Pokémon on the team yet.</p>";renderTeamAnalysis()}
-function renderTeamAnalysis(){if(!team.length){id("teamScore").textContent="—";id("teamSummary").innerHTML="<p class='muted'>Add Pokémon to score the team.</p>";id("teamWeaknesses").innerHTML="";id("teamStats").innerHTML="";id("teamRoles").innerHTML="";return}let weak={},roles={},speed=0,bst=0;team.forEach(p=>{let m=matchup(p.types);[...m["4x"],...m["2x"]].forEach(t=>weak[t]=(weak[t]||0)+1);roles[p.role]=(roles[p.role]||0)+1;speed+=p.stats.speed;bst+=Object.values(p.stats).reduce((a,b)=>a+b,0)});let overlap=Object.values(weak).filter(v=>v>=3).length,roleCount=Object.keys(roles).length,score=Math.max(40,Math.min(100,100-overlap*10+roleCount*3-(team.length<6?(6-team.length)*4:0)));id("teamScore").textContent=score+"/100";id("teamSummary").innerHTML=`<p class="good">✓ ${roleCount} role type(s) represented</p>`;id("teamWeaknesses").innerHTML=Object.entries(weak).sort((a,b)=>b[1]-a[1]).map(([t,c])=>`<div class="matchup-box">${badge(t)}<p>${c} member(s) weak</p></div>`).join("")||"<p class='muted'>No major weaknesses.</p>";id("teamStats").innerHTML=`<div class="mini-card"><strong>Average Speed</strong><p>${Math.round(speed/team.length)}</p></div><div class="mini-card"><strong>Average BST</strong><p>${Math.round(bst/team.length)}</p></div>`;id("teamRoles").innerHTML=Object.entries(roles).map(([r,c])=>`<div class="mini-card"><strong>${r}</strong><p>${c} Pokémon</p></div>`).join("")}
-function exportCSV(){id("exportOutput").value=["Name,Types,Role,Ability"].concat(team.map(p=>`${p.displayName},"${p.types.join("/")}",${p.role},${p.abilities[0]?.name||""}`)).join("\n")}
-function exportJSON(){id("exportOutput").value=JSON.stringify(team.map(p=>({name:p.displayName,types:p.types,role:p.role,ability:p.abilities[0]?.name})),null,2)}
-function exportShowdown(){id("exportOutput").value=team.map(p=>`${p.displayName} @ ${itemOf(p)}\nAbility: ${p.abilities[0]?.name||"Unknown"}\n${recommendedMoves(p).map(m=>"- "+m).join("\n")}`).join("\n\n")}
+function renderTeam(){id("teamCount").textContent=`${team.length} / 6`;id("teamSlots").innerHTML=team.map((p,i)=>`<div class="team-slot"><img src="${p.artwork}"><h3>${p.displayName}</h3><div>${p.types.map(badge).join("")}</div><p>${p.role}</p><p><strong>Ability:</strong> ${title(p.customAbility||p.abilities[0]?.name||"Unknown")}</p><p><strong>Item:</strong> ${p.heldItem||"None"}</p><button class="remove-btn" onclick="removeTeam(${i})">Remove</button></div>`).join("")||"<p class='muted'>No Pokémon on the team yet.</p>";renderTeamAnalysis()}
+function renderTeamAnalysis(){
+  if(!team.length){
+    id("teamScore").textContent="—";
+    id("teamSummary").innerHTML="<p class='muted'>Add Pokémon to score the team.</p>";
+    id("teamWeaknesses").innerHTML="";
+    id("teamStats").innerHTML="";
+    id("teamRoles").innerHTML="";
+    return;
+  }
+
+  let weak={}, roles={}, speed=0, bst=0;
+  team.forEach(p=>{
+    let m=matchup(p.types);
+    [...m["4x"],...m["2x"]].forEach(t=>weak[t]=(weak[t]||0)+1);
+    roles[p.role]=(roles[p.role]||0)+1;
+    speed+=p.stats.speed;
+    bst+=Object.values(p.stats).reduce((a,b)=>a+b,0);
+  });
+
+  const scores={
+    type:offensiveCoverageScore(),
+    defense:defensiveCoverageScore(),
+    role:roleBalanceScore(),
+    speed:speedControlScore()
+  };
+  const finalScore=Math.round((scores.type*.25)+(scores.defense*.35)+(scores.role*.2)+(scores.speed*.2));
+
+  id("teamScore").textContent=finalScore+"/100";
+  id("teamSummary").innerHTML=`
+    <div class="analysis-metric"><strong>Type Coverage</strong><div class="metric-score">${scores.type}/100</div></div>
+    <div class="analysis-metric"><strong>Defensive Coverage</strong><div class="metric-score">${scores.defense}/100</div></div>
+    <div class="analysis-metric"><strong>Role Balance</strong><div class="metric-score">${scores.role}/100</div></div>
+    <div class="analysis-metric"><strong>Speed Control</strong><div class="metric-score">${scores.speed}/100</div></div>
+  `;
+
+  id("teamWeaknesses").innerHTML=Object.entries(weak)
+    .sort((a,b)=>b[1]-a[1])
+    .map(([t,c])=>`<div class="matchup-box">${badge(t)}<p>${c} member(s) weak</p></div>`)
+    .join("")||"<p class='muted'>No major shared weaknesses.</p>";
+
+  id("teamStats").innerHTML=`
+    <div class="mini-card"><strong>Average Speed</strong><p>${Math.round(speed/team.length)}</p></div>
+    <div class="mini-card"><strong>Average BST / Custom Total</strong><p>${Math.round(bst/team.length)}</p></div>
+    <div class="mini-card"><strong>Fast Pokémon</strong><p>${team.filter(p=>p.stats.speed>=100).length}</p></div>
+  `;
+
+  const suggestions=teamSuggestions(scores, weak, roles);
+  id("teamRoles").innerHTML=Object.entries(roles).map(([r,c])=>`<div class="mini-card"><strong>${r}</strong><p>${c} Pokémon</p></div>`).join("")+
+    `<div class="mini-card suggestion-list"><strong>Suggestions</strong>${suggestions.map(s=>`<p>• ${s}</p>`).join("")}</div>`;
+}
+function exportCSV(){id("exportOutput").value=["Name,Types,Role,Ability,Held Item"].concat(team.map(p=>`${p.displayName},"${p.types.join("/")}",${p.role},${p.customAbility||p.abilities[0]?.name||""},${p.heldItem||""}`)).join("\n")}
+function exportJSON(){id("exportOutput").value=JSON.stringify(team.map(p=>({name:p.displayName,types:p.types,role:p.role,ability:p.customAbility||p.abilities[0]?.name, item:p.heldItem})),null,2)}
+function exportShowdown(){id("exportOutput").value=team.map(p=>`${p.displayName} @ ${p.heldItem||itemOf(p)}\nAbility: ${p.customAbility||p.abilities[0]?.name||"Unknown"}\n${recommendedMoves(p).map(m=>"- "+m).join("\n")}`).join("\n\n")}
 async function suggest(){let q=id("pokemonSearch").value;if(q.length<2){id("suggestions").classList.add("hidden");return}let r=await fetch(`${API_BASE}/pokemon?limit=1300`),d=await r.json();let s=d.results.filter(x=>x.name.includes(norm(q))).slice(0,6);id("suggestions").innerHTML=s.map(x=>`<div class="suggestion" onclick="pick('${x.name}')">${title(x.name)} <small>${x.name}</small></div>`).join("");id("suggestions").classList.toggle("hidden",!s.length)}
 function pick(n){id("pokemonSearch").value=n;id("suggestions").classList.add("hidden");runSearch(n)}
-document.addEventListener("DOMContentLoaded",()=>{id("searchButton").onclick=()=>runSearch(id("pokemonSearch").value);id("pokemonSearch").onkeydown=e=>{if(e.key==="Enter")runSearch(id("pokemonSearch").value)};id("pokemonSearch").oninput=suggest;id("addTeamBtn").onclick=addToTeam;id("clearTeamBtn").onclick=clearTeam;id("saveTeamBtn").onclick=saveTeam;id("loadTeamBtn").onclick=loadTeam;id("csvBtn").onclick=exportCSV;id("jsonBtn").onclick=exportJSON;id("showdownBtn").onclick=exportShowdown;id("moveSearch").oninput=applyMoveFilters;id("typeFilter").onchange=applyMoveFilters;id("categoryFilter").onchange=applyMoveFilters;id("shinyToggle").onchange=()=>{id("shinyStatus").textContent=id("shinyToggle").checked?"ON":"OFF";if(currentPokemon)id("officialArtwork").src=id("shinyToggle").checked&&currentPokemon.shiny?currentPokemon.shiny:currentPokemon.artwork};id("themeToggle").onclick=()=>{document.body.classList.toggle("light");id("themeToggle").textContent=document.body.classList.contains("light")?"🌙 Dark":"☀️ Light"};runSearch("charizard");renderTeam()});
+document.addEventListener("DOMContentLoaded",()=>{id("searchButton").onclick=()=>runSearch(id("pokemonSearch").value);id("pokemonSearch").onkeydown=e=>{if(e.key==="Enter")runSearch(id("pokemonSearch").value)};id("pokemonSearch").oninput=suggest;id("addTeamBtn").onclick=addToTeam;id("clearTeamBtn").onclick=clearTeam;id("saveTeamBtn").onclick=saveTeam;id("loadTeamBtn").onclick=loadTeam;id("csvBtn").onclick=exportCSV;id("jsonBtn").onclick=exportJSON;id("showdownBtn").onclick=exportShowdown;if(id("resetCustomBtn"))id("resetCustomBtn").onclick=resetCustomInputs;id("moveSearch").oninput=applyMoveFilters;id("typeFilter").onchange=applyMoveFilters;id("categoryFilter").onchange=applyMoveFilters;id("shinyToggle").onchange=()=>{id("shinyStatus").textContent=id("shinyToggle").checked?"ON":"OFF";if(currentPokemon)id("officialArtwork").src=id("shinyToggle").checked&&currentPokemon.shiny?currentPokemon.shiny:currentPokemon.artwork};id("themeToggle").onclick=()=>{document.body.classList.toggle("light");id("themeToggle").textContent=document.body.classList.contains("light")?"🌙 Dark":"☀️ Light"};runSearch("charizard");renderTeam()});
