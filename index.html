@@ -3,18 +3,19 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>PokéAnalysis Sprint 4.2</title>
+  <title>PokéAnalysis Sprint 4.3</title>
   <link rel="stylesheet" href="css/styles.css" />
 </head>
 <body>
 <div class="app">
   <aside class="sidebar">
     <div class="brand">⚪ PokéAnalysis<span>Pro</span></div>
-    <p>Sprint 4.2 · Pokédex + Competitive + Team Builder</p>
+    <p>Sprint 4.3 · Evolution Chain Viewer</p>
     <nav>
       <a href="#analyzer" class="active">Pokémon Analyzer</a>
       <a href="#pokedexSection">Pokédex Entry</a>
       <a href="#competitive">Competitive</a>
+      <a href="#evolutionChainSection">Evolution Chain</a>
       <a href="#teamBuilder">Team Builder</a>
       <a href="#moveDatabase">Move Database</a>
       <a href="#exports">Exports</a>
@@ -96,6 +97,13 @@
       </article>
     </section>
 
+
+    <section class="card" id="evolutionChainSection">
+      <h2>Evolution Chain</h2>
+      <p class="muted">Evolution path and requirements from PokéAPI.</p>
+      <div id="evolutionChain" class="evolution-chain">Search for a Pokémon to view its evolution chain.</div>
+    </section>
+
     <section class="card" id="teamBuilder">
       <div class="card-head">
         <h2>Team Builder</h2>
@@ -164,7 +172,7 @@
       <textarea id="exportOutput" placeholder="Export output appears here." readonly></textarea>
     </section>
 
-    <footer>PokéAnalysis Sprint 4.2 True Replacement · Data from PokéAPI</footer>
+    <footer>PokéAnalysis Sprint 4.3 True Replacement · Data from PokéAPI</footer>
   </main>
 </div>
 <script src="js/app.js"></script>

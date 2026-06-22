@@ -9,3 +9,9 @@ Visible changes:
 - Team Builder, exports, dark/light toggle, shiny toggle, type calculator, Mega notes, and gender differences are retained.
 
 Upload the extracted contents to GitHub. Replace the old index.html, css folder, js folder, README, and assets folder.
+
+## Sprint 4.3 Evolution Chain Update
+- Added Evolution Chain Viewer.
+- Added evolution requirement display such as level, item, trade, friendship, held item, known move, time of day, and location when available.
+- Added Mega Evolution notes inside the Evolution Chain section.
+- Fixed generation formatting so Gen II displays correctly instead of Gen Ii.
