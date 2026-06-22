@@ -1,79 +1,28 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>PokéAnalysis Sprint 2 Fixed</title>
-  <link rel="stylesheet" href="css/styles.css" />
-</head>
-<body>
-  <div class="app-shell">
-    <header class="app-header">
-      <div>
-        <h1>PokéAnalysis</h1>
-        <p class="subtitle">Sprint 2 Fixed · Type Calculator Visible Build</p>
-      </div>
-      <button id="themeToggle" class="theme-toggle" type="button">☀️ Light</button>
-    </header>
-
-    <section class="search-panel">
-      <div class="search-row">
-        <input id="pokemonSearch" type="text" placeholder="Search Pokémon, e.g. Charizard, Garchomp, Pikachu" />
-        <button id="searchButton" type="button">Search</button>
-      </div>
-      <p class="hint">The type calculator appears directly below the Pokémon overview after every search.</p>
-      <div id="loading" class="loading hidden"><span class="spinner"></span>Loading Pokémon data...</div>
-      <div id="errorBox" class="error-box hidden"></div>
-    </section>
-
-    <main class="dashboard">
-      <section class="card pokemon-card">
-        <div class="artwork-wrap">
-          <img id="officialArtwork" src="" alt="Pokémon official artwork" />
-        </div>
-        <h2 id="pokemonName">Search for a Pokémon</h2>
-        <div id="typeBadges" class="type-row"></div>
-        <dl class="quick-facts">
-          <div><dt>Dex #</dt><dd id="dexNumber">—</dd></div>
-          <div><dt>Species</dt><dd id="species">—</dd></div>
-          <div><dt>Height</dt><dd id="height">—</dd></div>
-          <div><dt>Weight</dt><dd id="weight">—</dd></div>
-        </dl>
-        <p id="description" class="description">Pokémon details will appear here.</p>
-      </section>
-
-      <section class="card stats-card">
-        <div class="card-heading">
-          <h2>Base Stats</h2>
-          <div class="bst-box">BST <span id="bst">0</span></div>
-        </div>
-        <div id="stats" class="stats-list"></div>
-      </section>
-
-      <section class="card ability-card">
-        <h2>Abilities</h2>
-        <div id="abilities" class="abilities-list"></div>
-      </section>
-    </main>
-
-    <section class="card type-card highlight-card">
-      <h2>Real Type Weakness / Resistance Calculator</h2>
-      <p class="description">This is calculated from the Pokémon's defensive typing using the full 18-type chart.</p>
-      <div id="typeMatchups" class="matchup-grid"></div>
-    </section>
-
-    
-
-    <footer>
-      <p>PokéAnalysis Sprint 2 Fixed · Class project/demo · Data from PokéAPI</p>
-    </footer>
-  </div>
-
-  <script src="js/utils.js"></script>
-  <script src="js/typeChart.js"></script>
-  <script src="js/api.js"></script>
-  <script src="js/ui.js"></script>
-  
-  <script src="js/app.js"></script>
-</body>
-</html>
+<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>PokéAnalysis Sprint 3</title><link rel="stylesheet" href="css/styles.css"></head>
+<body><div class="app">
+<aside class="sidebar"><div class="brand">⚪ PokéAnalysis<span>Pro</span></div><p>Analyze. Optimize. Dominate.</p>
+<nav><a class="active">Pokémon Analyzer</a><a>Team Builder</a><a>Move Database</a><a>Resources</a></nav>
+<div class="about"><strong>About</strong><p>Class project demo with live Pokémon data, type analysis, moves, Mega Evolutions, gender info, and competitive suggestions.</p></div></aside>
+<main class="main">
+<header class="topbar"><div class="search-wrap"><input id="pokemonSearch" placeholder="Search Pokémon..." autocomplete="off"><div id="suggestions" class="suggestions hidden"></div></div><button id="searchButton">Analyze</button>
+<label class="toggle"><span>Shiny</span><input id="shinyToggle" type="checkbox"><b></b><small id="shinyStatus">OFF</small></label></header>
+<div id="loading" class="loading hidden">Loading Pokémon data...</div><div id="errorBox" class="error hidden"></div>
+<section class="grid top-grid">
+<article class="card hero-card"><img id="officialArtwork" alt="Pokémon artwork"><div class="hero-info"><span id="dexNumber"></span><h1 id="pokemonName">Search Pokémon</h1><div id="typeBadges" class="badges"></div><p id="species"></p><p id="height"></p><p id="weight"></p></div></article>
+<article class="card"><h2>Base Stats</h2><div id="stats"></div><h3>Total <span id="bst">0</span></h3></article>
+<article class="card"><h2>Abilities</h2><div id="abilities"></div></article>
+<article class="card"><h2>Forms & Mega Evolutions</h2><div id="formsPanel"></div><div id="megaPanel"></div></article>
+</section>
+<section class="grid mid-grid">
+<article class="card"><h2>Type Effectiveness</h2><div id="typeMatchups" class="matchups"></div></article>
+<article class="card"><h2>Competitive Analysis</h2><div id="competitivePanel"></div></article>
+<article class="card"><h2>Gender Differences</h2><div id="genderPanel"></div></article>
+</section>
+<section class="grid move-grid">
+<article class="card move-table-card"><h2>Move Database</h2><div class="filters"><input id="moveSearch" placeholder="Search moves..."><select id="typeFilter"><option value="">All Types</option></select><select id="categoryFilter"><option value="">All Categories</option></select></div><div class="table-wrap"><table><thead><tr><th>Move</th><th>Type</th><th>Category</th><th>Power</th><th>Accuracy</th><th>PP</th></tr></thead><tbody id="movesBody"></tbody></table></div></article>
+<article class="card"><h2>Move Details</h2><div id="moveDetails">Select a move to view details.</div></article>
+</section>
+<footer>PokéAnalysis Sprint 3 · GitHub Pages Ready · Data from PokéAPI</footer></main></div>
+<script src="js/utils.js"></script><script src="js/typeChart.js"></script><script src="js/megaData.js"></script><script src="js/competitive.js"></script><script src="js/api.js"></script><script src="js/ui.js"></script><script src="js/app.js"></script></body></html>
