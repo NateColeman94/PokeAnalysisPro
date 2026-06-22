@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PokéAnalysis Sprint 2 Fixed</title>
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+  <div class="app-shell">
+    <header class="app-header">
+      <div>
+        <h1>PokéAnalysis</h1>
+        <p class="subtitle">Sprint 2 Fixed · Type Calculator Visible Build</p>
+      </div>
+      <button id="themeToggle" class="theme-toggle" type="button">☀️ Light</button>
+    </header>
+
+    <section class="search-panel">
+      <div class="search-row">
+        <input id="pokemonSearch" type="text" placeholder="Search Pokémon, e.g. Charizard, Garchomp, Pikachu" />
+        <button id="searchButton" type="button">Search</button>
+      </div>
+      <p class="hint">The type calculator appears directly below the Pokémon overview after every search.</p>
+      <div id="loading" class="loading hidden"><span class="spinner"></span>Loading Pokémon data...</div>
+      <div id="errorBox" class="error-box hidden"></div>
+    </section>
+
+    <main class="dashboard">
+      <section class="card pokemon-card">
+        <div class="artwork-wrap">
+          <img id="officialArtwork" src="" alt="Pokémon official artwork" />
+        </div>
+        <h2 id="pokemonName">Search for a Pokémon</h2>
+        <div id="typeBadges" class="type-row"></div>
+        <dl class="quick-facts">
+          <div><dt>Dex #</dt><dd id="dexNumber">—</dd></div>
+          <div><dt>Species</dt><dd id="species">—</dd></div>
+          <div><dt>Height</dt><dd id="height">—</dd></div>
+          <div><dt>Weight</dt><dd id="weight">—</dd></div>
+        </dl>
+        <p id="description" class="description">Pokémon details will appear here.</p>
+      </section>
+
+      <section class="card stats-card">
+        <div class="card-heading">
+          <h2>Base Stats</h2>
+          <div class="bst-box">BST <span id="bst">0</span></div>
+        </div>
+        <div id="stats" class="stats-list"></div>
+      </section>
+
+      <section class="card ability-card">
+        <h2>Abilities</h2>
+        <div id="abilities" class="abilities-list"></div>
+      </section>
+    </main>
+
+    <section class="card type-card highlight-card">
+      <h2>Real Type Weakness / Resistance Calculator</h2>
+      <p class="description">This is calculated from the Pokémon's defensive typing using the full 18-type chart.</p>
+      <div id="typeMatchups" class="matchup-grid"></div>
+    </section>
+
+    
+
+    <footer>
+      <p>PokéAnalysis Sprint 2 Fixed · Class project/demo · Data from PokéAPI</p>
+    </footer>
+  </div>
+
+  <script src="js/utils.js"></script>
+  <script src="js/typeChart.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/ui.js"></script>
+  
+  <script src="js/app.js"></script>
+</body>
+</html>
