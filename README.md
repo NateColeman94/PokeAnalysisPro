@@ -1,18 +1,18 @@
-# PokéAnalysis Sprint 5.5
+# PokéAnalysis Sprint 5.6
 
-Battle Planner build.
+Team Core Analyzer and fixes build.
 
-## New in Sprint 5.5
-- Opponent Team Builder
-- Add/remove opponent Pokémon
-- Compare your team against an opponent team
-- Top opponent threat scoring
-- Recommended lead suggestions
-- Speed issue detection
-- Battle notes
-- Win condition ideas
+## Fixes
+- Default attacker level is now 50.
+- Default defender level is now 50.
+- Added full official Mega Evolution demo database, including Mega Swampert and Mega Steelix.
+- Raichu correctly shows Alolan Raichu as an alternate form, not a Mega Evolution.
+- Opponent Pokémon input now has autocomplete suggestions.
+- Opponent Team cards match the sizing style of Your Team cards.
 
-## What Sprint 5.5 means
-Sprint 5.5 is not a full battle simulator. It is a battle planning tool that helps you prepare for matchups by comparing teams and surfacing threats, leads, and strategic concerns.
+## New in Sprint 5.6
+- Team Core Analyzer
+- Detects common cores such as Fire / Water / Grass and Dragon / Fairy / Steel.
+- Adds team structure suggestions.
 
 Upload extracted files to GitHub and replace old files.

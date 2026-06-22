@@ -3,14 +3,14 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>PokéAnalysis Sprint 5.5</title>
+  <title>PokéAnalysis Sprint 5.6</title>
   <link rel="stylesheet" href="css/styles.css" />
 </head>
 <body>
 <div class="app">
   <aside class="sidebar">
     <div class="brand">⚪ PokéAnalysis<span>Pro</span></div>
-    <p>Sprint 5.5 · Battle Planner</p>
+    <p>Sprint 5.6 · Team Core Analyzer</p>
     <nav>
       <a href="#pokemonOverview" class="active">Pokémon Overview</a>
       <a href="#pokedexRow">Pokédex Entry</a>
@@ -23,6 +23,7 @@
       <a href="#customTeamInputs">Custom Team Inputs</a>
       <a href="#damageCalculator">Damage Calculator</a>
       <a href="#battlePlanner">Battle Planner</a>
+      <a href="#teamCoreAnalyzer">Team Core Analyzer</a>
       <a href="#teamBuilder">Team Builder</a>
       <a href="#teamAnalysis">Team Analysis</a>
       <a href="#moveDatabase">Move Database</a>
@@ -118,7 +119,7 @@
       <p class="muted">Plan EVs, level, and nature to estimate final stats. These values can be carried into the Team Builder.</p>
 
       <div class="custom-grid custom-grid-small">
-        <label>Level <input id="calcLevel" type="number" min="1" max="100" value="100"></label>
+        <label>Level <input id="calcLevel" type="number" min="1" max="100" value="50"></label>
         <label>Nature <select id="natureSelect"></select></label>
         <button id="resetEvIvBtn" type="button">Reset EV + Nature Builder</button>
       </div>
@@ -158,7 +159,7 @@
       <div class="custom-grid custom-grid-small">
         <label>Attacker Move <select id="damageMoveSelect"></select></label>
         <label>Defender Pokémon <input id="defenderSearch" placeholder="e.g. scizor, steelix, garchomp"></label>
-        <label>Defender Level <input id="defenderLevel" type="number" min="1" max="100" value="100"></label>
+        <label>Defender Level <input id="defenderLevel" type="number" min="1" max="100" value="50"></label>
         <button id="loadDefenderBtn" type="button">Load Defender</button>
       </div>
 
@@ -196,7 +197,7 @@
       <p class="muted">Compare your saved team against an opponent team. This planner estimates threats, leads, speed problems, and matchup notes.</p>
 
       <div class="custom-grid custom-grid-small">
-        <label>Opponent Pokémon <input id="opponentInput" placeholder="e.g. garchomp"></label>
+        <label>Opponent Pokémon <div class="search-wrap opponent-search-wrap"><input id="opponentInput" placeholder="e.g. garchomp" autocomplete="off"><div id="opponentSuggestions" class="suggestions hidden"></div></div></label>
         <button id="addOpponentBtn" type="button">Add Opponent</button>
         <button id="clearOpponentBtn" type="button">Clear Opponent Team</button>
         <button id="analyzeBattleBtn" type="button">Analyze Battle</button>
@@ -215,6 +216,17 @@
 
       <div id="battlePlanResult" class="battle-plan-result">
         Add your team and opponent Pokémon, then click Analyze Battle.
+      </div>
+    </section>
+
+
+    
+    <section class="card" id="teamCoreAnalyzer">
+      <h2>Team Core Analyzer</h2>
+      <p class="muted">Detects common competitive team cores and suggests missing structure.</p>
+      <div id="teamCoreResult" class="battle-plan-result">Add Pokémon to your team, then click Analyze Team Cores.</div>
+      <div class="team-buttons">
+        <button id="analyzeCoreBtn" type="button">Analyze Team Cores</button>
       </div>
     </section>
 
@@ -287,7 +299,7 @@
       <textarea id="exportOutput" placeholder="Export output appears here." readonly></textarea>
     </section>
 
-    <footer>PokéAnalysis Sprint 5.5 · EV + Nature Builder · Data from PokéAPI</footer>
+    <footer>PokéAnalysis Sprint 5.6 · EV + Nature Builder · Data from PokéAPI</footer>
   </main>
 </div>
 <script src="js/app.js"></script>

@@ -1,7 +1,57 @@
 const API_BASE="https://pokeapi.co/api/v2";
 const TYPES=["normal","fire","water","electric","grass","ice","fighting","poison","ground","flying","psychic","bug","rock","ghost","dragon","dark","steel","fairy"];
 const CHART={normal:{rock:.5,ghost:0,steel:.5},fire:{fire:.5,water:.5,grass:2,ice:2,bug:2,rock:.5,dragon:.5,steel:2},water:{fire:2,water:.5,grass:.5,ground:2,rock:2,dragon:.5},electric:{water:2,electric:.5,grass:.5,ground:0,flying:2,dragon:.5},grass:{fire:.5,water:2,grass:.5,poison:.5,ground:2,flying:.5,bug:.5,rock:2,dragon:.5,steel:.5},ice:{fire:.5,water:.5,grass:2,ice:.5,ground:2,flying:2,dragon:2,steel:.5},fighting:{normal:2,ice:2,poison:.5,flying:.5,psychic:.5,bug:.5,rock:2,ghost:0,dark:2,steel:2,fairy:.5},poison:{grass:2,poison:.5,ground:.5,rock:.5,ghost:.5,steel:0,fairy:2},ground:{fire:2,electric:2,grass:.5,poison:2,flying:0,bug:.5,rock:2,steel:2},flying:{electric:.5,grass:2,fighting:2,bug:2,rock:.5,steel:.5},psychic:{fighting:2,poison:2,psychic:.5,dark:0,steel:.5},bug:{fire:.5,grass:2,fighting:.5,poison:.5,flying:.5,psychic:2,ghost:.5,dark:2,steel:.5,fairy:.5},rock:{fire:2,ice:2,fighting:.5,ground:.5,flying:2,bug:2,steel:.5},ghost:{normal:0,psychic:2,ghost:2,dark:.5},dragon:{dragon:2,steel:.5,fairy:0},dark:{fighting:.5,psychic:2,ghost:2,dark:.5,fairy:.5},steel:{fire:.5,water:.5,electric:.5,ice:2,rock:2,steel:.5,fairy:2},fairy:{fire:.5,fighting:2,poison:.5,dragon:2,dark:2,steel:.5}};
-const MEGA={charizard:[["Mega Charizard X",["fire","dragon"],"Tough Claws"],["Mega Charizard Y",["fire","flying"],"Drought"]],venusaur:[["Mega Venusaur",["grass","poison"],"Thick Fat"]],blastoise:[["Mega Blastoise",["water"],"Mega Launcher"]],gengar:[["Mega Gengar",["ghost","poison"],"Shadow Tag"]],lucario:[["Mega Lucario",["fighting","steel"],"Adaptability"]],garchomp:[["Mega Garchomp",["dragon","ground"],"Sand Force"]],steelix:[["Mega Steelix",["steel","ground"],"Sand Force"]],alakazam:[["Mega Alakazam",["psychic"],"Trace"]],gyarados:[["Mega Gyarados",["water","dark"],"Mold Breaker"]],mawile:[["Mega Mawile",["steel","fairy"],"Huge Power"]],sableye:[["Mega Sableye",["dark","ghost"],"Magic Bounce"]],aggron:[["Mega Aggron",["steel"],"Filter"]],ampharos:[["Mega Ampharos",["electric","dragon"],"Mold Breaker"]],houndoom:[["Mega Houndoom",["dark","fire"],"Solar Power"]],manectric:[["Mega Manectric",["electric"],"Intimidate"]],banette:[["Mega Banette",["ghost"],"Prankster"]],abomasnow:[["Mega Abomasnow",["grass","ice"],"Snow Warning"]],lopunny:[["Mega Lopunny",["normal","fighting"],"Scrappy"]],gardevoir:[["Mega Gardevoir",["psychic","fairy"],"Pixilate"]],gallade:[["Mega Gallade",["psychic","fighting"],"Inner Focus"]],aerodactyl:[["Mega Aerodactyl",["rock","flying"],"Tough Claws"]],scizor:[["Mega Scizor",["bug","steel"],"Technician"]],heracross:[["Mega Heracross",["bug","fighting"],"Skill Link"]],pinsir:[["Mega Pinsir",["bug","flying"],"Aerilate"]],kangaskhan:[["Mega Kangaskhan",["normal"],"Parental Bond"]]};
+const MEGA={
+venusaur:[["Mega Venusaur",["grass","poison"],"Thick Fat"]],
+charizard:[["Mega Charizard X",["fire","dragon"],"Tough Claws"],["Mega Charizard Y",["fire","flying"],"Drought"]],
+blastoise:[["Mega Blastoise",["water"],"Mega Launcher"]],
+alakazam:[["Mega Alakazam",["psychic"],"Trace"]],
+gengar:[["Mega Gengar",["ghost","poison"],"Shadow Tag"]],
+kangaskhan:[["Mega Kangaskhan",["normal"],"Parental Bond"]],
+pinsir:[["Mega Pinsir",["bug","flying"],"Aerilate"]],
+gyarados:[["Mega Gyarados",["water","dark"],"Mold Breaker"]],
+aerodactyl:[["Mega Aerodactyl",["rock","flying"],"Tough Claws"]],
+mewtwo:[["Mega Mewtwo X",["psychic","fighting"],"Steadfast"],["Mega Mewtwo Y",["psychic"],"Insomnia"]],
+ampharos:[["Mega Ampharos",["electric","dragon"],"Mold Breaker"]],
+steelix:[["Mega Steelix",["steel","ground"],"Sand Force"]],
+scizor:[["Mega Scizor",["bug","steel"],"Technician"]],
+heracross:[["Mega Heracross",["bug","fighting"],"Skill Link"]],
+houndoom:[["Mega Houndoom",["dark","fire"],"Solar Power"]],
+tyranitar:[["Mega Tyranitar",["rock","dark"],"Sand Stream"]],
+sceptile:[["Mega Sceptile",["grass","dragon"],"Lightning Rod"]],
+blaziken:[["Mega Blaziken",["fire","fighting"],"Speed Boost"]],
+swampert:[["Mega Swampert",["water","ground"],"Swift Swim"]],
+gardevoir:[["Mega Gardevoir",["psychic","fairy"],"Pixilate"]],
+sableye:[["Mega Sableye",["dark","ghost"],"Magic Bounce"]],
+mawile:[["Mega Mawile",["steel","fairy"],"Huge Power"]],
+aggron:[["Mega Aggron",["steel"],"Filter"]],
+medicham:[["Mega Medicham",["fighting","psychic"],"Pure Power"]],
+manectric:[["Mega Manectric",["electric"],"Intimidate"]],
+sharpedo:[["Mega Sharpedo",["water","dark"],"Strong Jaw"]],
+camerupt:[["Mega Camerupt",["fire","ground"],"Sheer Force"]],
+altaria:[["Mega Altaria",["dragon","fairy"],"Pixilate"]],
+banette:[["Mega Banette",["ghost"],"Prankster"]],
+absol:[["Mega Absol",["dark"],"Magic Bounce"]],
+glalie:[["Mega Glalie",["ice"],"Refrigerate"]],
+salamence:[["Mega Salamence",["dragon","flying"],"Aerilate"]],
+metagross:[["Mega Metagross",["steel","psychic"],"Tough Claws"]],
+latias:[["Mega Latias",["dragon","psychic"],"Levitate"]],
+latios:[["Mega Latios",["dragon","psychic"],"Levitate"]],
+lopunny:[["Mega Lopunny",["normal","fighting"],"Scrappy"]],
+garchomp:[["Mega Garchomp",["dragon","ground"],"Sand Force"]],
+lucario:[["Mega Lucario",["fighting","steel"],"Adaptability"]],
+abomasnow:[["Mega Abomasnow",["grass","ice"],"Snow Warning"]],
+gallade:[["Mega Gallade",["psychic","fighting"],"Inner Focus"]],
+audino:[["Mega Audino",["normal","fairy"],"Healer"]],
+diancie:[["Mega Diancie",["rock","fairy"],"Magic Bounce"]],
+beedrill:[["Mega Beedrill",["bug","poison"],"Adaptability"]],
+pidgeot:[["Mega Pidgeot",["normal","flying"],"No Guard"]],
+slowbro:[["Mega Slowbro",["water","psychic"],"Shell Armor"]],
+rayquaza:[["Mega Rayquaza",["dragon","flying"],"Delta Stream"]]
+};
+const ALT_FORMS={
+raichu:[["Alolan Raichu",["electric","psychic"],"Surge Surfer","Alternate form, not a Mega Evolution"]]
+};
 let currentPokemon=null,currentMoves=[],filteredMoves=[],team=[];
 function id(x){return document.getElementById(x)}
 function title(t){return String(t||"").replace(/-/g," ").split(" ").map(w=>w?w[0].toUpperCase()+w.slice(1):"").join(" ")}
@@ -84,7 +134,14 @@ function renderStats(p){let list=[["HP",p.stats.hp],["Attack",p.stats.attack],["
 function renderAbilities(p){id("abilities").innerHTML=p.abilities.map(a=>`<div class="ability"><strong>${title(a.name)}</strong><p>${a.description}</p>${a.hidden?'<span class="pill">Hidden Ability</span>':''}</div>`).join("")}
 function list(a){return a.map(badge).join("")||"<em>None</em>"}
 function renderTypes(p){let m=matchup(p.types);id("typeMatchups").innerHTML=`<div class="matchup-box"><h3>4× Weak</h3>${list(m["4x"])}</div><div class="matchup-box"><h3>2× Weak</h3>${list(m["2x"])}</div><div class="matchup-box"><h3>Neutral</h3>${list(m["1x"])}</div><div class="matchup-box"><h3>½× Resist</h3>${list(m["0.5x"])}</div><div class="matchup-box"><h3>¼× Resist</h3>${list(m["0.25x"])}</div><div class="matchup-box"><h3>0× Immune</h3>${list(m["0x"])}</div>`}
-function renderForms(p){id("formsPanel").innerHTML=`<div class="mini-card"><strong>${p.displayName}</strong>${p.types.map(badge).join("")}</div>`;let megas=MEGA[p.name]||[];id("megaPanel").innerHTML="<h3>Mega Evolutions</h3>"+(megas.length?megas.map(m=>`<div class="mini-card"><strong>${m[0]}</strong><p>Ability: ${m[2]}</p>${m[1].map(badge).join("")}</div>`).join(""):"<p>No Mega Evolution in built-in demo database.</p>")}
+function renderForms(p){
+  id("formsPanel").innerHTML=`<div class="mini-card"><strong>${p.displayName}</strong>${p.types.map(badge).join("")}</div>`;
+  let megas=MEGA[p.name]||[];
+  let alts=ALT_FORMS[p.name]||[];
+  const megaHtml=megas.length?megas.map(m=>`<div class="mini-card"><strong>${m[0]}</strong><p>Ability: ${m[2]}</p>${m[1].map(badge).join("")}</div>`).join(""):"<p>No official Mega Evolution.</p>";
+  const altHtml=alts.length?`<h3>Alternate Forms</h3>${alts.map(f=>`<div class="mini-card"><strong>${f[0]}</strong><p>${f[3]}</p><p>Ability: ${f[2]}</p>${f[1].map(badge).join("")}</div>`).join("")}`:"";
+  id("megaPanel").innerHTML="<h3>Mega Evolutions</h3>"+megaHtml+altHtml;
+}
 function renderGender(p){id("genderPanel").innerHTML=`<h3>Gender Differences</h3><div class="mini-card"><strong>${p.genderText}</strong></div><p>${p.hasGenderDifferences?"This species has visual gender differences.":"No known visual gender differences listed by the data source."}</p>`}
 function renderComp(p){let hidden=p.abilities.find(a=>a.hidden),moves=recommendedMoves(p),m=matchup(p.types);let concerns=[];if(m["4x"].length)concerns.push("4× weakness: "+m["4x"].map(title).join(", "));if(p.types.includes("fire")&&p.types.includes("flying"))concerns.push("Heavy-Duty Boots recommended because of Rock/Stealth Rock pressure.");if(!concerns.length)concerns.push("No major red-flag concern from base typing alone.");id("competitivePanel").innerHTML=`<div class="recommend-grid"><div class="mini-card"><strong>Suggested Role</strong><p>${p.role}</p></div><div class="mini-card"><strong>Recommended Nature</strong><p>${natureOf(p)}</p></div><div class="mini-card"><strong>Recommended Ability</strong><p>${hidden?title(hidden.name)+" (Hidden option)":title(p.abilities[0]?.name||"Unknown")}</p></div><div class="mini-card"><strong>Recommended Item</strong><p>${itemOf(p)}</p></div></div><h3>Recommended Moveset</h3><div class="mini-card">${moves.map(x=>`<p class="good">✓ ${x}</p>`).join("")}</div><h3>Why this recommendation?</h3><p class="good">✓ Role is based primarily on base stats.</p><p class="good">✓ Typing, abilities, and move data adjust the recommendation.</p><h3>Concerns</h3>${concerns.map(x=>`<p class="bad">× ${x}</p>`).join("")}`}
 function recommendedMoves(p){let stab=p.moves.filter(m=>p.types.includes(m.type)&&m.power).sort((a,b)=>(b.power||0)-(a.power||0)).slice(0,2);let cov=p.moves.filter(m=>!p.types.includes(m.type)&&m.power).sort((a,b)=>(b.power||0)-(a.power||0)).slice(0,2);let util=p.moves.filter(m=>m.category==="status").slice(0,2);return [...stab,...cov,...util].slice(0,4).map(m=>title(m.name))}
@@ -288,7 +345,7 @@ function calcOther(base,iv,ev,level,stat){
 }
 function collectEvIvNature(){
   return {
-    level:getNum("calcLevel",100),
+    level:getNum("calcLevel",50),
     nature:id("natureSelect")?.value||"Serious",
     evs:{
       hp:getNum("evHP"),attack:getNum("evAttack"),defense:getNum("evDefense"),
@@ -333,7 +390,7 @@ function renderEvIvBuilder(p=currentPokemon){
 }
 function resetEvIvBuilder(){
   ["evHP","evAttack","evDefense","evSpA","evSpD","evSpeed"].forEach(x=>{if(id(x))id(x).value=0});
-  if(id("calcLevel")) id("calcLevel").value=100;
+  if(id("calcLevel")) id("calcLevel").value=50;
   if(id("natureSelect") && currentPokemon) id("natureSelect").value=suggestNatureFor(currentPokemon);
   calculateFinalStats();
 }
@@ -387,8 +444,8 @@ function calculateSimplifiedDamage(){
   }
 
   const attackerBuild=calculateFinalStats?.() || null;
-  const level=getNum("calcLevel",100);
-  const defenderLevel=Math.max(1,Math.min(100,getNum("defenderLevel",100)));
+  const level=getNum("calcLevel",50);
+  const defenderLevel=Math.max(1,Math.min(100,getNum("defenderLevel",50)));
   const attackStat=move.category==="physical"
     ? (attackerBuild?.finalStats?.attack || currentPokemon.stats.attack)
     : (attackerBuild?.finalStats?.specialAttack || currentPokemon.stats.specialAttack);
@@ -457,6 +514,27 @@ function renderBattleTeams(){
   if(opp){
     opp.innerHTML=opponentTeam.length?opponentTeam.map((p,i)=>battleCard(p,`<button class="remove-btn" onclick="removeOpponent(${i})">Remove</button>`)).join(""):"No opponent Pokémon added yet.";
   }
+}
+
+
+async function suggestOpponent(){
+  const input=id("opponentInput");
+  const box=id("opponentSuggestions");
+  if(!input || !box) return;
+  const q=input.value;
+  if(q.length<2){
+    box.classList.add("hidden");
+    return;
+  }
+  const r=await fetch(`${API_BASE}/pokemon?limit=1300`);
+  const d=await r.json();
+  const s=d.results.filter(x=>x.name.includes(norm(q))).slice(0,6);
+  box.innerHTML=s.map(x=>`<div class="suggestion" onclick="pickOpponent('${x.name}')">${title(x.name)} <small>${x.name}</small></div>`).join("");
+  box.classList.toggle("hidden",!s.length);
+}
+function pickOpponent(n){
+  id("opponentInput").value=n;
+  id("opponentSuggestions").classList.add("hidden");
 }
 
 function battleCard(p,extra=""){
@@ -584,7 +662,39 @@ function analyzeBattle(){
   `;
 }
 
+
+function analyzeTeamCores(){
+  const out=id("teamCoreResult");
+  if(!out) return;
+  if(!team.length){
+    out.innerHTML="Add Pokémon to your team first.";
+    return;
+  }
+  const allTypes=new Set(team.flatMap(p=>p.types));
+  const names=team.map(p=>p.displayName);
+  const cores=[];
+  if(allTypes.has("fire") && allTypes.has("water") && allTypes.has("grass")) cores.push("Fire / Water / Grass Core");
+  if(allTypes.has("dragon") && allTypes.has("fairy") && allTypes.has("steel")) cores.push("Dragon / Fairy / Steel Core");
+  if(allTypes.has("ground") && allTypes.has("flying")) cores.push("Ground / Flying Immunity Core");
+  if(allTypes.has("dark") && allTypes.has("ghost")) cores.push("Dark / Ghost Pressure Core");
+
+  const suggestions=[];
+  if(!(allTypes.has("fire") && allTypes.has("water") && allTypes.has("grass"))) suggestions.push("Consider building toward a Fire / Water / Grass defensive core.");
+  if(!(allTypes.has("dragon") && allTypes.has("fairy") && allTypes.has("steel"))) suggestions.push("Consider a Dragon / Fairy / Steel core for balanced resistances.");
+  if(!team.some(p=>(p.evIvNature?.finalStats?.speed||p.stats.speed)>=100)) suggestions.push("Add a faster Pokémon or speed-control option.");
+  if(!team.some(p=>["Defensive Tank","Wall","Bulky Support"].includes(p.role))) suggestions.push("Add a defensive backbone such as a tank, wall, or bulky support Pokémon.");
+
+  out.innerHTML=`
+    <h3>Detected Cores</h3>
+    ${cores.length?cores.map(c=>`<span class="core-badge">${c}</span>`).join(""):"<p class='muted'>No major classic core detected yet.</p>"}
+    <h3>Team Members</h3>
+    <p>${names.join(", ")}</p>
+    <h3>Suggestions</h3>
+    ${suggestions.length?suggestions.map(s=>`<p>• ${s}</p>`).join(""):"<p class='good'>Team has solid basic core structure.</p>"}
+  `;
+}
+
 document.addEventListener("DOMContentLoaded",()=>{id("searchButton").onclick=()=>runSearch(id("pokemonSearch").value);id("pokemonSearch").onkeydown=e=>{if(e.key==="Enter")runSearch(id("pokemonSearch").value)};id("pokemonSearch").oninput=suggest;id("addTeamBtn").onclick=addToTeam;id("clearTeamBtn").onclick=clearTeam;id("saveTeamBtn").onclick=saveTeam;id("loadTeamBtn").onclick=loadTeam;id("csvBtn").onclick=exportCSV;id("jsonBtn").onclick=exportJSON;id("showdownBtn").onclick=exportShowdown;if(id("resetCustomBtn"))id("resetCustomBtn").onclick=resetCustomInputs;id("moveSearch").oninput=applyMoveFilters;id("typeFilter").onchange=applyMoveFilters;id("categoryFilter").onchange=applyMoveFilters;id("shinyToggle").onchange=()=>{id("shinyStatus").textContent=id("shinyToggle").checked?"ON":"OFF";if(currentPokemon)id("officialArtwork").src=id("shinyToggle").checked&&currentPokemon.shiny?currentPokemon.shiny:currentPokemon.artwork};id("themeToggle").onclick=()=>{document.body.classList.toggle("light");id("themeToggle").textContent=document.body.classList.contains("light")?"🌙 Dark":"☀️ Light"};
 ["calcLevel","natureSelect","evHP","evAttack","evDefense","evSpA","evSpD","evSpeed"].forEach(x=>{if(id(x)){id(x).oninput=calculateFinalStats;id(x).onchange=calculateFinalStats;}});
 if(id("resetEvIvBtn"))id("resetEvIvBtn").onclick=resetEvIvBuilder;
-if(id("loadDefenderBtn"))id("loadDefenderBtn").onclick=loadDamageDefender;if(id("calculateDamageBtn"))id("calculateDamageBtn").onclick=calculateSimplifiedDamage;if(id("addOpponentBtn"))id("addOpponentBtn").onclick=addOpponent;if(id("clearOpponentBtn"))id("clearOpponentBtn").onclick=clearOpponentTeam;if(id("analyzeBattleBtn"))id("analyzeBattleBtn").onclick=analyzeBattle;runSearch("charizard");renderBattleTeams();renderTeam()});
+if(id("loadDefenderBtn"))id("loadDefenderBtn").onclick=loadDamageDefender;if(id("calculateDamageBtn"))id("calculateDamageBtn").onclick=calculateSimplifiedDamage;if(id("addOpponentBtn"))id("addOpponentBtn").onclick=addOpponent;if(id("clearOpponentBtn"))id("clearOpponentBtn").onclick=clearOpponentTeam;if(id("analyzeBattleBtn"))id("analyzeBattleBtn").onclick=analyzeBattle;if(id("opponentInput"))id("opponentInput").oninput=suggestOpponent;if(id("analyzeCoreBtn"))id("analyzeCoreBtn").onclick=analyzeTeamCores;runSearch("charizard");renderBattleTeams();renderTeam()});

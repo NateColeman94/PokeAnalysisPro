@@ -261,3 +261,30 @@ body.light{--bg:#eef3fb;--panel:#ffffff;--panel2:#f4f7fb;--line:#cdd8e8;--text:#
   color:#64e87b;
   font-weight:900;
 }
+
+
+/* ===== Sprint 5.6 Fixes and Team Core Analyzer ===== */
+.opponent-search-wrap{
+  margin-top:6px;
+}
+#battlePlanner .two-col{
+  align-items:start;
+}
+#battlePlanner .mini-card{
+  min-height:220px;
+}
+#battleYourTeam,
+#opponentTeamSlots{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(170px,1fr));
+  gap:10px;
+}
+.core-badge{
+  display:inline-block;
+  padding:6px 10px;
+  border-radius:999px;
+  background:#203352;
+  color:white;
+  margin:4px;
+  font-weight:800;
+}
