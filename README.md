@@ -12,3 +12,8 @@ Upload extracted files to GitHub and keep css/styles.css and js/app.js in their 
 - Competitive analysis uses base stats first, then typing, abilities, and move data.
 - Added recommended moveset logic.
 - Kept working Team Builder, exports, dark/light toggle, shiny toggle, Mega panel, and type calculator.
+
+## Sprint 4.2 Pokédex Update
+- Restored Pokédex entry/snippet.
+- Added generation, habitat, capture rate, base friendship, hatch steps, legendary flag, and mythical flag.
+- Kept Sprint 4.1 competitive analysis, team builder, dark/light toggle, shiny toggle, and exports.
