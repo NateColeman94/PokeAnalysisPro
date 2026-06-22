@@ -1,18 +1,12 @@
-# PokéAnalysis Sprint 5.6
+# PokéAnalysis Sprint 5.6.1 Cleanup Patch
 
-Team Core Analyzer and fixes build.
+Small cleanup patch based on Sprint 5.6.
 
-## Fixes
-- Default attacker level is now 50.
-- Default defender level is now 50.
-- Added full official Mega Evolution demo database, including Mega Swampert and Mega Steelix.
-- Raichu correctly shows Alolan Raichu as an alternate form, not a Mega Evolution.
-- Opponent Pokémon input now has autocomplete suggestions.
-- Opponent Team cards match the sizing style of Your Team cards.
+## Changes
+- Removed Raichu alternate-form note.
+- Forms / Mega / Gender section now only shows official Mega Evolutions and gender information.
+- If a Pokémon has no official Mega Evolution, it displays: No official Mega Evolution.
+- Keeps Mega Swampert, Mega Steelix, Mega Charizard X/Y, and other official Mega Evolutions.
+- Keeps Sprint 5.6 Team Core Analyzer, Battle Planner, Damage Calculator, EV Builder, Team Builder, and other existing features.
 
-## New in Sprint 5.6
-- Team Core Analyzer
-- Detects common cores such as Fire / Water / Grass and Dragon / Fairy / Steel.
-- Adds team structure suggestions.
-
-Upload extracted files to GitHub and replace old files.
+Upload the extracted files to GitHub and replace the old files.

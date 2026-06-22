@@ -49,9 +49,6 @@ pidgeot:[["Mega Pidgeot",["normal","flying"],"No Guard"]],
 slowbro:[["Mega Slowbro",["water","psychic"],"Shell Armor"]],
 rayquaza:[["Mega Rayquaza",["dragon","flying"],"Delta Stream"]]
 };
-const ALT_FORMS={
-raichu:[["Alolan Raichu",["electric","psychic"],"Surge Surfer","Alternate form, not a Mega Evolution"]]
-};
 let currentPokemon=null,currentMoves=[],filteredMoves=[],team=[];
 function id(x){return document.getElementById(x)}
 function title(t){return String(t||"").replace(/-/g," ").split(" ").map(w=>w?w[0].toUpperCase()+w.slice(1):"").join(" ")}
@@ -137,10 +134,10 @@ function renderTypes(p){let m=matchup(p.types);id("typeMatchups").innerHTML=`<di
 function renderForms(p){
   id("formsPanel").innerHTML=`<div class="mini-card"><strong>${p.displayName}</strong>${p.types.map(badge).join("")}</div>`;
   let megas=MEGA[p.name]||[];
-  let alts=ALT_FORMS[p.name]||[];
-  const megaHtml=megas.length?megas.map(m=>`<div class="mini-card"><strong>${m[0]}</strong><p>Ability: ${m[2]}</p>${m[1].map(badge).join("")}</div>`).join(""):"<p>No official Mega Evolution.</p>";
-  const altHtml=alts.length?`<h3>Alternate Forms</h3>${alts.map(f=>`<div class="mini-card"><strong>${f[0]}</strong><p>${f[3]}</p><p>Ability: ${f[2]}</p>${f[1].map(badge).join("")}</div>`).join("")}`:"";
-  id("megaPanel").innerHTML="<h3>Mega Evolutions</h3>"+megaHtml+altHtml;
+  const megaHtml=megas.length
+    ? megas.map(m=>`<div class="mini-card"><strong>${m[0]}</strong><p>Ability: ${m[2]}</p>${m[1].map(badge).join("")}</div>`).join("")
+    : "<p>No official Mega Evolution.</p>";
+  id("megaPanel").innerHTML="<h3>Mega Evolutions</h3>"+megaHtml;
 }
 function renderGender(p){id("genderPanel").innerHTML=`<h3>Gender Differences</h3><div class="mini-card"><strong>${p.genderText}</strong></div><p>${p.hasGenderDifferences?"This species has visual gender differences.":"No known visual gender differences listed by the data source."}</p>`}
 function renderComp(p){let hidden=p.abilities.find(a=>a.hidden),moves=recommendedMoves(p),m=matchup(p.types);let concerns=[];if(m["4x"].length)concerns.push("4× weakness: "+m["4x"].map(title).join(", "));if(p.types.includes("fire")&&p.types.includes("flying"))concerns.push("Heavy-Duty Boots recommended because of Rock/Stealth Rock pressure.");if(!concerns.length)concerns.push("No major red-flag concern from base typing alone.");id("competitivePanel").innerHTML=`<div class="recommend-grid"><div class="mini-card"><strong>Suggested Role</strong><p>${p.role}</p></div><div class="mini-card"><strong>Recommended Nature</strong><p>${natureOf(p)}</p></div><div class="mini-card"><strong>Recommended Ability</strong><p>${hidden?title(hidden.name)+" (Hidden option)":title(p.abilities[0]?.name||"Unknown")}</p></div><div class="mini-card"><strong>Recommended Item</strong><p>${itemOf(p)}</p></div></div><h3>Recommended Moveset</h3><div class="mini-card">${moves.map(x=>`<p class="good">✓ ${x}</p>`).join("")}</div><h3>Why this recommendation?</h3><p class="good">✓ Role is based primarily on base stats.</p><p class="good">✓ Typing, abilities, and move data adjust the recommendation.</p><h3>Concerns</h3>${concerns.map(x=>`<p class="bad">× ${x}</p>`).join("")}`}
