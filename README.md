@@ -1,19 +1,11 @@
-# PokéAnalysis Sprint 4 Fixed Final
+# PokéAnalysis Sprint 4.2 True Replacement
 
-Fixes:
-- Dark/light toggle is visible in the top bar and defaults to dark.
-- Team Builder is wired directly and works with Add to Team, Remove, Save, Load, and exports.
-- Uses a single app.js file to reduce missing-file issues on GitHub Pages.
+This is a clean replacement build, not a patch.
 
-Upload extracted files to GitHub and keep css/styles.css and js/app.js in their folders.
+Visible changes:
+- Pokédex Entry card is visible near the top.
+- Pokédex details include generation, habitat, capture rate, base friendship, hatch steps, legendary/mythical.
+- Competitive Analysis is rebuilt with role, nature, ability, item, recommended moveset, reasons, and concerns.
+- Team Builder, exports, dark/light toggle, shiny toggle, type calculator, Mega notes, and gender differences are retained.
 
-## Sprint 4.1 Merge Update
-- Restored stronger competitive analysis from Sprint 3.
-- Competitive analysis uses base stats first, then typing, abilities, and move data.
-- Added recommended moveset logic.
-- Kept working Team Builder, exports, dark/light toggle, shiny toggle, Mega panel, and type calculator.
-
-## Sprint 4.2 Pokédex Update
-- Restored Pokédex entry/snippet.
-- Added generation, habitat, capture rate, base friendship, hatch steps, legendary flag, and mythical flag.
-- Kept Sprint 4.1 competitive analysis, team builder, dark/light toggle, shiny toggle, and exports.
+Upload the extracted contents to GitHub. Replace the old index.html, css folder, js folder, README, and assets folder.
