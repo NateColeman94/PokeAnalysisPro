@@ -3,14 +3,14 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>PokéAnalysis Sprint 5.2</title>
+  <title>PokéAnalysis Sprint 5.2.1</title>
   <link rel="stylesheet" href="css/styles.css" />
 </head>
 <body>
 <div class="app">
   <aside class="sidebar">
     <div class="brand">⚪ PokéAnalysis<span>Pro</span></div>
-    <p>Sprint 5.2 · EV / IV + Nature Builder</p>
+    <p>Sprint 5.2.1 · EV + Nature Cleanup</p>
     <nav>
       <a href="#pokemonOverview" class="active">Pokémon Overview</a>
       <a href="#pokedexRow">Pokédex Entry</a>
@@ -19,7 +19,7 @@
       <a href="#abilitiesCard">Abilities</a>
       <a href="#typeEffectiveness">Type Effectiveness</a>
       <a href="#competitive">Competitive Analysis</a>
-      <a href="#evIvBuilder">EV / IV Builder</a>
+      <a href="#evIvBuilder">EV + Nature Builder</a>
       <a href="#customTeamInputs">Custom Team Inputs</a>
       <a href="#teamBuilder">Team Builder</a>
       <a href="#teamAnalysis">Team Analysis</a>
@@ -28,7 +28,7 @@
     </nav>
     <div class="about">
       <strong>Sprint 5.2</strong>
-      <p>Cleaner layout, EV/IV/nature tools, improved team details, and sidebar navigation in page order.</p>
+      <p>Cleaner layout, EV/nature tools, improved team details, and sidebar navigation in page order.</p>
     </div>
   </aside>
 
@@ -112,13 +112,13 @@
     </section>
 
     <section class="card" id="evIvBuilder">
-      <h2>EV / IV + Nature Builder</h2>
-      <p class="muted">Plan EVs, IVs, level, and nature to estimate final stats. These values can be carried into the Team Builder.</p>
+      <h2>EV + Nature Builder</h2>
+      <p class="muted">Plan EVs, level, and nature to estimate final stats. These values can be carried into the Team Builder.</p>
 
       <div class="custom-grid custom-grid-small">
         <label>Level <input id="calcLevel" type="number" min="1" max="100" value="100"></label>
         <label>Nature <select id="natureSelect"></select></label>
-        <button id="resetEvIvBtn" type="button">Reset EV / IV Builder</button>
+        <button id="resetEvIvBtn" type="button">Reset EV + Nature Builder</button>
       </div>
 
       <h3>EVs</h3>
@@ -132,16 +132,6 @@
         <label>Speed EV <input id="evSpeed" type="number" min="0" max="252" value="0"></label>
       </div>
 
-      <h3>IVs</h3>
-      <div class="custom-grid">
-        <label>HP IV <input id="ivHP" type="number" min="0" max="31" value="31"></label>
-        <label>Attack IV <input id="ivAttack" type="number" min="0" max="31" value="31"></label>
-        <label>Defense IV <input id="ivDefense" type="number" min="0" max="31" value="31"></label>
-        <label>Sp. Attack IV <input id="ivSpA" type="number" min="0" max="31" value="31"></label>
-        <label>Sp. Defense IV <input id="ivSpD" type="number" min="0" max="31" value="31"></label>
-        <label>Speed IV <input id="ivSpeed" type="number" min="0" max="31" value="31"></label>
-      </div>
-
       <div id="evWarning" class="error hidden"></div>
 
       <h3>Final Stat Estimate</h3>
@@ -149,20 +139,12 @@
     </section>
 
     <section class="card" id="customTeamInputs">
-      <h2>Custom Team Inputs</h2>
-      <p class="muted">Optional: override displayed stats, choose ability, assign held item, and carry EV/IV/nature information into the team card.</p>
-      <div class="custom-grid">
-        <label>HP <input id="customHP" type="number" min="1" placeholder="Base"></label>
-        <label>Attack <input id="customAttack" type="number" min="1" placeholder="Base"></label>
-        <label>Defense <input id="customDefense" type="number" min="1" placeholder="Base"></label>
-        <label>Sp. Attack <input id="customSpA" type="number" min="1" placeholder="Base"></label>
-        <label>Sp. Defense <input id="customSpD" type="number" min="1" placeholder="Base"></label>
-        <label>Speed <input id="customSpeed" type="number" min="1" placeholder="Base"></label>
-      </div>
+      <h2>Team Build Options</h2>
+      <p class="muted">Choose the ability and held item that should be saved with this Pokémon when you add it to your team.</p>
       <div class="custom-grid custom-grid-small">
         <label>Selected Ability <select id="customAbility"></select></label>
         <label>Held Item <input id="customItem" placeholder="e.g. Leftovers, Heavy-Duty Boots"></label>
-        <button id="resetCustomBtn" type="button">Reset Custom Inputs</button>
+        <button id="resetCustomBtn" type="button">Reset Ability / Item</button>
       </div>
     </section>
 
@@ -234,7 +216,7 @@
       <textarea id="exportOutput" placeholder="Export output appears here." readonly></textarea>
     </section>
 
-    <footer>PokéAnalysis Sprint 5.2 · EV / IV + Nature Builder · Data from PokéAPI</footer>
+    <footer>PokéAnalysis Sprint 5.2.1 · EV + Nature Builder · Data from PokéAPI</footer>
   </main>
 </div>
 <script src="js/app.js"></script>

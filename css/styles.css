@@ -198,3 +198,9 @@ body.light{--bg:#eef3fb;--panel:#ffffff;--panel2:#f4f7fb;--line:#cdd8e8;--text:#
   color:var(--muted);
   line-height:1.35;
 }
+
+
+/* ===== Sprint 5.2.1 Cleanup ===== */
+#customTeamInputs .custom-grid{
+  grid-template-columns:repeat(auto-fit,minmax(240px,1fr));
+}

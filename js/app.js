@@ -1,7 +1,7 @@
 const API_BASE="https://pokeapi.co/api/v2";
 const TYPES=["normal","fire","water","electric","grass","ice","fighting","poison","ground","flying","psychic","bug","rock","ghost","dragon","dark","steel","fairy"];
 const CHART={normal:{rock:.5,ghost:0,steel:.5},fire:{fire:.5,water:.5,grass:2,ice:2,bug:2,rock:.5,dragon:.5,steel:2},water:{fire:2,water:.5,grass:.5,ground:2,rock:2,dragon:.5},electric:{water:2,electric:.5,grass:.5,ground:0,flying:2,dragon:.5},grass:{fire:.5,water:2,grass:.5,poison:.5,ground:2,flying:.5,bug:.5,rock:2,dragon:.5,steel:.5},ice:{fire:.5,water:.5,grass:2,ice:.5,ground:2,flying:2,dragon:2,steel:.5},fighting:{normal:2,ice:2,poison:.5,flying:.5,psychic:.5,bug:.5,rock:2,ghost:0,dark:2,steel:2,fairy:.5},poison:{grass:2,poison:.5,ground:.5,rock:.5,ghost:.5,steel:0,fairy:2},ground:{fire:2,electric:2,grass:.5,poison:2,flying:0,bug:.5,rock:2,steel:2},flying:{electric:.5,grass:2,fighting:2,bug:2,rock:.5,steel:.5},psychic:{fighting:2,poison:2,psychic:.5,dark:0,steel:.5},bug:{fire:.5,grass:2,fighting:.5,poison:.5,flying:.5,psychic:2,ghost:.5,dark:2,steel:.5,fairy:.5},rock:{fire:2,ice:2,fighting:.5,ground:.5,flying:2,bug:2,steel:.5},ghost:{normal:0,psychic:2,ghost:2,dark:.5},dragon:{dragon:2,steel:.5,fairy:0},dark:{fighting:.5,psychic:2,ghost:2,dark:.5,fairy:.5},steel:{fire:.5,water:.5,electric:.5,ice:2,rock:2,steel:.5,fairy:2},fairy:{fire:.5,fighting:2,poison:.5,dragon:2,dark:2,steel:.5}};
-const MEGA={charizard:[["Mega Charizard X",["fire","dragon"],"Tough Claws"],["Mega Charizard Y",["fire","flying"],"Drought"]],venusaur:[["Mega Venusaur",["grass","poison"],"Thick Fat"]],blastoise:[["Mega Blastoise",["water"],"Mega Launcher"]],gengar:[["Mega Gengar",["ghost","poison"],"Shadow Tag"]],lucario:[["Mega Lucario",["fighting","steel"],"Adaptability"]],garchomp:[["Mega Garchomp",["dragon","ground"],"Sand Force"]]};
+const MEGA={charizard:[["Mega Charizard X",["fire","dragon"],"Tough Claws"],["Mega Charizard Y",["fire","flying"],"Drought"]],venusaur:[["Mega Venusaur",["grass","poison"],"Thick Fat"]],blastoise:[["Mega Blastoise",["water"],"Mega Launcher"]],gengar:[["Mega Gengar",["ghost","poison"],"Shadow Tag"]],lucario:[["Mega Lucario",["fighting","steel"],"Adaptability"]],garchomp:[["Mega Garchomp",["dragon","ground"],"Sand Force"]],steelix:[["Mega Steelix",["steel","ground"],"Sand Force"]],alakazam:[["Mega Alakazam",["psychic"],"Trace"]],gyarados:[["Mega Gyarados",["water","dark"],"Mold Breaker"]],mawile:[["Mega Mawile",["steel","fairy"],"Huge Power"]],sableye:[["Mega Sableye",["dark","ghost"],"Magic Bounce"]],aggron:[["Mega Aggron",["steel"],"Filter"]],ampharos:[["Mega Ampharos",["electric","dragon"],"Mold Breaker"]],houndoom:[["Mega Houndoom",["dark","fire"],"Solar Power"]],manectric:[["Mega Manectric",["electric"],"Intimidate"]],banette:[["Mega Banette",["ghost"],"Prankster"]],abomasnow:[["Mega Abomasnow",["grass","ice"],"Snow Warning"]],lopunny:[["Mega Lopunny",["normal","fighting"],"Scrappy"]],gardevoir:[["Mega Gardevoir",["psychic","fairy"],"Pixilate"]],gallade:[["Mega Gallade",["psychic","fighting"],"Inner Focus"]],aerodactyl:[["Mega Aerodactyl",["rock","flying"],"Tough Claws"]],scizor:[["Mega Scizor",["bug","steel"],"Technician"]],heracross:[["Mega Heracross",["bug","fighting"],"Skill Link"]],pinsir:[["Mega Pinsir",["bug","flying"],"Aerilate"]],kangaskhan:[["Mega Kangaskhan",["normal"],"Parental Bond"]]};
 let currentPokemon=null,currentMoves=[],filteredMoves=[],team=[];
 function id(x){return document.getElementById(x)}
 function title(t){return String(t||"").replace(/-/g," ").split(" ").map(w=>w?w[0].toUpperCase()+w.slice(1):"").join(" ")}
@@ -74,14 +74,11 @@ function renderEvolution(p){
     container.innerHTML="<p class='muted'>No evolution chain data available.</p>";
     return;
   }
-  const cards=chain.map((e,i)=>{
+  container.innerHTML=chain.map((e,i)=>{
     const arrow=i===0?"":`<div class="evo-arrow">↓<br><span class="evo-requirement">${e.requirement}</span></div>`;
     return `${arrow}<div class="evo-card"><h3>${title(e.name)}</h3><p>Stage ${e.stage}</p></div>`;
   }).join("");
-  const megas=(MEGA[p.name]||[]).map(m=>`<div class="mini-card"><strong>${m[0]}</strong><p>Ability: ${m[2]}</p>${m[1].map(badge).join("")}</div>`).join("");
-  container.innerHTML=cards+(megas?`<div class="evo-mega"><h3>Mega Evolution Available</h3>${megas}</div>`:"");
 }
-
 function renderDex(p){id("pokedexEntry").textContent=p.description||"No Pokédex entry available.";id("pokedexInfo").innerHTML=`<div class="mini-card"><strong>Generation</strong><p>${p.generation}</p></div><div class="mini-card"><strong>Habitat</strong><p>${p.habitat}</p></div><div class="mini-card"><strong>Capture Rate</strong><p>${p.captureRate}</p></div><div class="mini-card"><strong>Base Friendship</strong><p>${p.baseFriendship}</p></div><div class="mini-card"><strong>Hatch Steps</strong><p>${p.hatchSteps}</p></div><div class="mini-card"><strong>Legendary / Mythical</strong><p>${p.legendary} / ${p.mythical}</p></div>`}
 function renderStats(p){let list=[["HP",p.stats.hp],["Attack",p.stats.attack],["Defense",p.stats.defense],["Sp. Atk",p.stats.specialAttack],["Sp. Def",p.stats.specialDefense],["Speed",p.stats.speed]];id("bst").textContent=list.reduce((a,[,v])=>a+v,0);id("stats").innerHTML=list.map(([l,v])=>`<div class="stat-row"><div class="stat-label"><span>${l}</span><span>${v}</span></div><div class="bar"><div class="fill" style="width:${Math.min(v/255*100,100)}%"></div></div></div>`).join("")}
 function renderAbilities(p){id("abilities").innerHTML=p.abilities.map(a=>`<div class="ability"><strong>${title(a.name)}</strong><p>${a.description}</p>${a.hidden?'<span class="pill">Hidden Ability</span>':''}</div>`).join("")}
@@ -102,24 +99,14 @@ function renderCustomInputs(p){
   abilitySelect.innerHTML=(p.abilities||[]).map(a=>`<option value="${a.name}">${title(a.name)}${a.hidden?" (Hidden)":""}</option>`).join("");
   const preferred=p.abilities.find(a=>a.hidden)?.name || p.abilities[0]?.name || "";
   abilitySelect.value=preferred;
-  ["customHP","customAttack","customDefense","customSpA","customSpD","customSpeed"].forEach(x=>{ if(id(x)) id(x).value=""; });
   if(id("customItem")) id("customItem").value=itemOf(p);
 }
 function resetCustomInputs(){
-  ["customHP","customAttack","customDefense","customSpA","customSpD","customSpeed"].forEach(x=>{ if(id(x)) id(x).value=""; });
   if(currentPokemon) renderCustomInputs(currentPokemon);
 }
 function teamReadyPokemon(){
   if(!currentPokemon) return null;
   const p=JSON.parse(JSON.stringify(currentPokemon));
-  const map=[
-    ["customHP","hp"],["customAttack","attack"],["customDefense","defense"],
-    ["customSpA","specialAttack"],["customSpD","specialDefense"],["customSpeed","speed"]
-  ];
-  map.forEach(([input,stat])=>{
-    const val=parseInt(id(input)?.value||"",10);
-    if(!Number.isNaN(val) && val>0) p.stats[stat]=val;
-  });
   p.customAbility=id("customAbility")?.value || p.abilities[0]?.name || "Unknown";
   p.heldItem=id("customItem")?.value || itemOf(p);
   p.role=roleOf(p);
@@ -345,13 +332,12 @@ function renderEvIvBuilder(p=currentPokemon){
 }
 function resetEvIvBuilder(){
   ["evHP","evAttack","evDefense","evSpA","evSpD","evSpeed"].forEach(x=>{if(id(x))id(x).value=0});
-  ["ivHP","ivAttack","ivDefense","ivSpA","ivSpD","ivSpeed"].forEach(x=>{if(id(x))id(x).value=31});
   if(id("calcLevel")) id("calcLevel").value=100;
   if(id("natureSelect") && currentPokemon) id("natureSelect").value=suggestNatureFor(currentPokemon);
   calculateFinalStats();
 }
 
 document.addEventListener("DOMContentLoaded",()=>{id("searchButton").onclick=()=>runSearch(id("pokemonSearch").value);id("pokemonSearch").onkeydown=e=>{if(e.key==="Enter")runSearch(id("pokemonSearch").value)};id("pokemonSearch").oninput=suggest;id("addTeamBtn").onclick=addToTeam;id("clearTeamBtn").onclick=clearTeam;id("saveTeamBtn").onclick=saveTeam;id("loadTeamBtn").onclick=loadTeam;id("csvBtn").onclick=exportCSV;id("jsonBtn").onclick=exportJSON;id("showdownBtn").onclick=exportShowdown;if(id("resetCustomBtn"))id("resetCustomBtn").onclick=resetCustomInputs;id("moveSearch").oninput=applyMoveFilters;id("typeFilter").onchange=applyMoveFilters;id("categoryFilter").onchange=applyMoveFilters;id("shinyToggle").onchange=()=>{id("shinyStatus").textContent=id("shinyToggle").checked?"ON":"OFF";if(currentPokemon)id("officialArtwork").src=id("shinyToggle").checked&&currentPokemon.shiny?currentPokemon.shiny:currentPokemon.artwork};id("themeToggle").onclick=()=>{document.body.classList.toggle("light");id("themeToggle").textContent=document.body.classList.contains("light")?"🌙 Dark":"☀️ Light"};
-["calcLevel","natureSelect","evHP","evAttack","evDefense","evSpA","evSpD","evSpeed","ivHP","ivAttack","ivDefense","ivSpA","ivSpD","ivSpeed"].forEach(x=>{if(id(x)){id(x).oninput=calculateFinalStats;id(x).onchange=calculateFinalStats;}});
+["calcLevel","natureSelect","evHP","evAttack","evDefense","evSpA","evSpD","evSpeed"].forEach(x=>{if(id(x)){id(x).oninput=calculateFinalStats;id(x).onchange=calculateFinalStats;}});
 if(id("resetEvIvBtn"))id("resetEvIvBtn").onclick=resetEvIvBuilder;
 runSearch("charizard");renderTeam()});
