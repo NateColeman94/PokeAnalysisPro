@@ -601,6 +601,59 @@ function defensiveThreatScore(opponent){
   return score;
 }
 
+
+function bestMoveAgainst(attacker, defender){
+  let best=null;
+  (attacker.moves||[]).filter(m=>m.power).slice(0,60).forEach(m=>{
+    const eff=typeEffectiveness(m.type,defender.types);
+    const stab=attacker.types.includes(m.type)?1.5:1;
+    const score=(m.power||0)*eff*stab;
+    if(!best || score>best.score) best={move:m,score,effectiveness:eff,stab};
+  });
+  return best;
+}
+function threatReasons(opponent){
+  const reasons=[];
+  const oppSpeed=opponent.stats.speed;
+  const slower=team.filter(p=>(p.evIvNature?.finalStats?.speed||p.stats.speed)<oppSpeed).length;
+  if(slower>=4) reasons.push(`Faster than ${slower} team members.`);
+  let superHits=0;
+  team.forEach(p=>{
+    const best=bestMoveAgainst(opponent,p);
+    if(best && best.effectiveness>1) superHits++;
+  });
+  if(superHits) reasons.push(`Has super-effective coverage into ${superHits} team member(s).`);
+  const safeSwitches=team.filter(p=>{
+    const best=bestMoveAgainst(opponent,p);
+    return best && best.effectiveness<1;
+  }).length;
+  if(safeSwitches===0) reasons.push("No obvious resistance-based safe switch.");
+  else reasons.push(`${safeSwitches} possible resistance-based switch option(s).`);
+  if(["Physical Sweeper","Special Sweeper","Mixed Attacker"].includes(opponent.role)) reasons.push(`Offensive role: ${opponent.role}.`);
+  return reasons;
+}
+function threatLevel(score){
+  if(score>=22) return ["High Threat","bad-chip"];
+  if(score>=14) return ["Medium Threat","warn-chip"];
+  return ["Low Threat","good-chip"];
+}
+function bestSwitchesInto(opponent){
+  return team.map(p=>{
+    const best=bestMoveAgainst(opponent,p);
+    const speed=p.evIvNature?.finalStats?.speed||p.stats.speed;
+    const defensiveMatch=best ? (best.effectiveness===0?5:best.effectiveness<1?3:best.effectiveness===1?1:-2) : 0;
+    const roleBonus=["Defensive Tank","Wall","Bulky Support"].includes(p.role)?2:0;
+    return {pokemon:p,score:defensiveMatch+roleBonus+Math.min(2, speed/100),best};
+  }).sort((a,b)=>b.score-a.score).slice(0,3);
+}
+function winConditionIdeas(){
+  const sweepers=team.filter(p=>["Physical Sweeper","Special Sweeper","Mixed Attacker","Fast Utility"].includes(p.role));
+  return sweepers.length?sweepers.map(p=>{
+    const hits=opponentTeam.reduce((sum,o)=>sum+(bestMoveAgainst(p,o)?.effectiveness>1?1:0),0);
+    return {pokemon:p,reason:`Can pressure ${hits} opponent(s) super-effectively and has ${p.role} profile.`};
+  }).sort((a,b)=>b.reason.localeCompare(a.reason)).slice(0,3):[];
+}
+
 function analyzeBattle(){
   renderBattleTeams();
   const out=id("battlePlanResult");
@@ -614,51 +667,71 @@ function analyzeBattle(){
     const fasterThan=team.filter(p=>(p.evIvNature?.finalStats?.speed || p.stats.speed) < speed).length;
     const defensiveScore=defensiveThreatScore(o);
     const coverageAgainstUs=team.reduce((sum,p)=>sum+battleTypeScore(o,p),0);
-    const total=Math.round(defensiveScore + coverageAgainstUs + fasterThan);
-    return {pokemon:o,total,fasterThan,coverageAgainstUs,defensiveScore};
+    const reasons=threatReasons(o);
+    const total=Math.round(defensiveScore + coverageAgainstUs + fasterThan + reasons.length*2);
+    return {pokemon:o,total,fasterThan,coverageAgainstUs,defensiveScore,reasons};
   }).sort((a,b)=>b.total-a.total);
 
   const leadCandidates=team.map(p=>{
     const speed=p.evIvNature?.finalStats?.speed || p.stats.speed;
-    const hits=opponentTeam.reduce((sum,o)=>sum+battleTypeScore(p,o),0);
+    const hits=opponentTeam.reduce((sum,o)=>sum+(bestMoveAgainst(p,o)?.effectiveness>1?2:0),0);
+    const neutral=opponentTeam.reduce((sum,o)=>sum+(bestMoveAgainst(p,o)?.effectiveness===1?1:0),0);
     const weakToOpp=opponentTeam.reduce((sum,o)=>{
-      const m=matchup(p.types);
-      return sum+o.types.reduce((s,t)=>s+(m["4x"].includes(t)?2:m["2x"].includes(t)?1:0),0);
+      const best=bestMoveAgainst(o,p);
+      return sum+(best?.effectiveness>=2?2:best?.effectiveness===1?1:0);
     },0);
-    return {pokemon:p,score:Math.round(speed/20 + hits*4 - weakToOpp*2)};
+    const score=Math.round(speed/20 + hits*4 + neutral - weakToOpp*2);
+    const why=[];
+    if(speed>=100) why.push("Good speed for early momentum.");
+    if(hits) why.push(`Threatens ${hits/2} opponent(s) super-effectively.`);
+    if(weakToOpp<=2) why.push("Does not look overly exposed at preview.");
+    return {pokemon:p,score,why};
   }).sort((a,b)=>b.score-a.score).slice(0,3);
 
-  const speedIssues=opponentTeam.filter(o=>{
-    const oppSpeed=o.stats.speed;
-    return !team.some(p=>(p.evIvNature?.finalStats?.speed || p.stats.speed) >= oppSpeed);
-  });
-
-  const matchupNotes=[];
-  opponentThreats.slice(0,3).forEach(t=>{
-    const label=t.total>=18?"High":t.total>=11?"Medium":"Low";
-    matchupNotes.push(`<p><span class="${label==="High"?"threat-high":label==="Medium"?"threat-medium":"threat-low"}">${label} Threat:</span> ${t.pokemon.displayName}</p>`);
-  });
-  if(speedIssues.length){
-    matchupNotes.push(`<p class="bad">Speed issue: Your team may be slower than ${speedIssues.map(x=>x.displayName).join(", ")}.</p>`);
-  }else{
-    matchupNotes.push(`<p class="good">Speed control looks acceptable against this opponent team.</p>`);
-  }
+  const topThreat=opponentThreats[0]?.pokemon;
+  const switches=topThreat?bestSwitchesInto(topThreat):[];
+  const wins=winConditionIdeas();
 
   out.innerHTML=`
     <h3>Top Opponent Threats</h3>
-    ${opponentThreats.slice(0,6).map(t=>`<div class="mini-card"><strong>${t.pokemon.displayName}</strong><p>Threat Score: ${t.total}</p><div>${t.pokemon.types.map(badge).join("")}</div></div>`).join("")}
+    <div class="battle-grid">
+      ${opponentThreats.slice(0,6).map(t=>{
+        const [label,cls]=threatLevel(t.total);
+        return `<div class="recommend-card">
+          <div class="threat-title"><strong>${t.pokemon.displayName}</strong><span class="score-chip ${cls}">${label}: ${t.total}</span></div>
+          <div>${t.pokemon.types.map(badge).join("")}</div>
+          <ul class="reason-list">${t.reasons.map(r=>`<li>${r}</li>`).join("")}</ul>
+        </div>`;
+      }).join("")}
+    </div>
 
     <h3>Recommended Leads</h3>
-    ${leadCandidates.map(l=>`<div class="mini-card"><strong>${l.pokemon.displayName}</strong><p>Lead Score: ${l.score}</p><div>${l.pokemon.types.map(badge).join("")}</div></div>`).join("")}
+    <div class="battle-grid">
+      ${leadCandidates.map(l=>`<div class="recommend-card">
+        <strong>${l.pokemon.displayName}</strong>
+        <span class="score-chip">Lead Score: ${l.score}</span>
+        <div>${l.pokemon.types.map(badge).join("")}</div>
+        <ul class="reason-list">${l.why.length?l.why.map(w=>`<li>${w}</li>`).join(""):"<li>Balanced matchup option.</li>"}</ul>
+      </div>`).join("")}
+    </div>
 
-    <h3>Battle Notes</h3>
-    ${matchupNotes.join("")}
+    <h3>Safe Switch Ideas ${topThreat?`vs ${topThreat.displayName}`:""}</h3>
+    <div class="battle-grid">
+      ${switches.length?switches.map(s=>`<div class="recommend-card">
+        <strong>${s.pokemon.displayName}</strong>
+        <span class="score-chip">Switch Score: ${Math.round(s.score)}</span>
+        <div>${s.pokemon.types.map(badge).join("")}</div>
+        <p>${s.best?`Opponent best coverage estimate: ${title(s.best.move.name)} (${s.best.effectiveness}×)`:"No clear data."}</p>
+      </div>`).join(""):"<p>No switch suggestions available.</p>"}
+    </div>
 
     <h3>Win Condition Ideas</h3>
-    <p>Look for setup or pressure from your strongest offensive role Pokémon: ${team.filter(p=>["Physical Sweeper","Special Sweeper","Mixed Attacker"].includes(p.role)).map(p=>p.displayName).join(", ") || "No clear sweeper identified"}.</p>
+    ${wins.length?wins.map(w=>`<div class="recommend-card"><strong>${w.pokemon.displayName}</strong><p>${w.reason}</p></div>`).join(""):"<p>No clear offensive win condition detected yet.</p>"}
+
+    <h3>Battle Planner Notes</h3>
+    <p class="muted">This is still a planning tool, not a full simulator. It uses role, speed, type matchup, and move coverage heuristics.</p>
   `;
 }
-
 
 function analyzeTeamCores(){
   const out=id("teamCoreResult");

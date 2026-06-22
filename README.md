@@ -1,12 +1,25 @@
-# PokéAnalysis Sprint 5.6.1 Cleanup Patch
+# PokéAnalysis Sprint 5.7
 
-Small cleanup patch based on Sprint 5.6.
+Battle Planner 2.0 full replacement build.
 
-## Changes
-- Removed Raichu alternate-form note.
-- Forms / Mega / Gender section now only shows official Mega Evolutions and gender information.
-- If a Pokémon has no official Mega Evolution, it displays: No official Mega Evolution.
-- Keeps Mega Swampert, Mega Steelix, Mega Charizard X/Y, and other official Mega Evolutions.
-- Keeps Sprint 5.6 Team Core Analyzer, Battle Planner, Damage Calculator, EV Builder, Team Builder, and other existing features.
+## New in Sprint 5.7
+- Better opponent threat ranking.
+- Threat explanations instead of only raw scores.
+- Improved lead recommendations with reasons.
+- Safe switch ideas against the top opponent threat.
+- Win condition ideas.
+- Better Battle Planner result layout.
+- Keeps Sprint 5.6.1 cleanup behavior.
 
-Upload the extracted files to GitHub and replace the old files.
+## Still included
+- Pokédex Entry
+- Evolution Chain
+- EV + Nature Builder
+- Team Builder
+- Damage Calculator
+- Battle Planner
+- Team Core Analyzer
+- Official Mega Evolution database
+- Dark/Light toggle and Shiny toggle
+
+Upload extracted files to GitHub and replace the old files.

@@ -288,3 +288,47 @@ body.light{--bg:#eef3fb;--panel:#ffffff;--panel2:#f4f7fb;--line:#cdd8e8;--text:#
   margin:4px;
   font-weight:800;
 }
+
+
+/* ===== Sprint 5.7 Battle Planner 2.0 ===== */
+.battle-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+  gap:12px;
+}
+.reason-list{
+  margin:.4rem 0;
+  padding-left:1.2rem;
+}
+.reason-list li{
+  margin:.25rem 0;
+}
+.recommend-card{
+  background:var(--panel2);
+  border:1px solid var(--line);
+  border-radius:12px;
+  padding:12px;
+  margin:10px 0;
+}
+.threat-title{
+  display:flex;
+  justify-content:space-between;
+  gap:8px;
+  align-items:center;
+}
+.score-chip{
+  background:#203352;
+  color:white;
+  border-radius:999px;
+  padding:4px 9px;
+  font-weight:900;
+}
+.good-chip{
+  background:#1d5e35;
+}
+.warn-chip{
+  background:#725a11;
+}
+.bad-chip{
+  background:#7b2020;
+}
