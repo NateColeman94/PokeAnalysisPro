@@ -99,3 +99,102 @@ body.light{--bg:#eef3fb;--panel:#ffffff;--panel2:#f4f7fb;--line:#cdd8e8;--text:#
 .suggestion-list p{
   margin:.35rem 0;
 }
+
+
+/* ===== Sprint 5.2 Layout Cleanup ===== */
+.two-col{
+  grid-template-columns:1fr 1fr;
+}
+.hero-card{
+  margin-bottom:12px;
+}
+#pokedexRow,
+#statsAbilitiesRow{
+  margin-bottom:12px;
+}
+.card{
+  scroll-margin-top:18px;
+}
+.evolution-card,
+.pokedex-card{
+  min-height:260px;
+}
+@media(max-width:1100px){
+  .two-col{
+    grid-template-columns:1fr;
+  }
+}
+
+/* ===== Sprint 5.2 EV / IV + Nature Builder ===== */
+.custom-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(145px,1fr));
+  gap:10px;
+  margin:12px 0;
+}
+.custom-grid label{
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+  color:var(--muted);
+  font-weight:700;
+}
+.custom-grid input,
+.custom-grid select{
+  width:100%;
+  padding:10px 12px;
+  border-radius:9px;
+  border:1px solid var(--line);
+  background:var(--panel2);
+  color:var(--text);
+}
+.custom-grid-small{
+  grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+}
+.final-stats-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
+  gap:10px;
+}
+.final-stat-card{
+  background:var(--panel2);
+  border:1px solid var(--line);
+  border-radius:10px;
+  padding:12px;
+}
+.final-stat-card strong{
+  display:block;
+  color:var(--muted);
+  margin-bottom:6px;
+}
+.final-stat-card span{
+  font-size:1.8rem;
+  font-weight:900;
+  color:var(--yellow);
+}
+.ev-total-good{
+  color:#64e87b;
+}
+.ev-total-bad{
+  color:#ff7171;
+}
+.analysis-metric{
+  background:var(--panel2);
+  border:1px solid var(--line);
+  border-radius:10px;
+  padding:10px;
+  margin:8px 0;
+}
+.metric-score{
+  font-size:1.7rem;
+  font-weight:900;
+  color:var(--yellow);
+}
+.suggestion-list p{
+  margin:.35rem 0;
+}
+.team-slot small{
+  display:block;
+  color:var(--muted);
+  line-height:1.35;
+}

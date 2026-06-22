@@ -3,32 +3,37 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>PokéAnalysis Sprint 5.1</title>
+  <title>PokéAnalysis Sprint 5.2</title>
   <link rel="stylesheet" href="css/styles.css" />
 </head>
 <body>
 <div class="app">
   <aside class="sidebar">
     <div class="brand">⚪ PokéAnalysis<span>Pro</span></div>
-    <p>Sprint 5.1 · Advanced Team Analysis</p>
+    <p>Sprint 5.2 · EV / IV + Nature Builder</p>
     <nav>
-      <a href="#analyzer" class="active">Pokémon Analyzer</a>
-      <a href="#pokedexSection">Pokédex Entry</a>
-      <a href="#competitive">Competitive</a>
+      <a href="#pokemonOverview" class="active">Pokémon Overview</a>
+      <a href="#pokedexRow">Pokédex Entry</a>
       <a href="#evolutionChainSection">Evolution Chain</a>
+      <a href="#statsAbilitiesRow">Base Stats</a>
+      <a href="#abilitiesCard">Abilities</a>
+      <a href="#typeEffectiveness">Type Effectiveness</a>
+      <a href="#competitive">Competitive Analysis</a>
+      <a href="#evIvBuilder">EV / IV Builder</a>
       <a href="#customTeamInputs">Custom Team Inputs</a>
       <a href="#teamBuilder">Team Builder</a>
+      <a href="#teamAnalysis">Team Analysis</a>
       <a href="#moveDatabase">Move Database</a>
       <a href="#exports">Exports</a>
     </nav>
     <div class="about">
-      <strong>What is new in 4.2?</strong>
-      <p>Visible Pokédex entry, rebuilt competitive recommendations, and working team builder.</p>
+      <strong>Sprint 5.2</strong>
+      <p>Cleaner layout, EV/IV/nature tools, improved team details, and sidebar navigation in page order.</p>
     </div>
   </aside>
 
-  <main class="main" id="analyzer">
-    <header class="topbar">
+  <main class="main">
+    <header class="topbar" id="pokemonOverview">
       <div class="search-wrap">
         <input id="pokemonSearch" placeholder="Search Pokémon, e.g. charizard" autocomplete="off" />
         <div id="suggestions" class="suggestions hidden"></div>
@@ -47,51 +52,51 @@
     <div id="loading" class="loading hidden">Loading Pokémon data...</div>
     <div id="errorBox" class="error hidden"></div>
 
-    <section class="grid top-grid">
-      <article class="card hero-card">
-        <img id="officialArtwork" alt="Pokémon artwork" />
-        <div>
-          <span id="dexNumber"></span>
-          <h1 id="pokemonName">Search Pokémon</h1>
-          <div id="typeBadges" class="badges"></div>
-          <p id="species"></p>
-          <p id="height"></p>
-          <p id="weight"></p>
-        </div>
-      </article>
+    <section class="card hero-card">
+      <img id="officialArtwork" alt="Pokémon artwork" />
+      <div>
+        <span id="dexNumber"></span>
+        <h1 id="pokemonName">Search Pokémon</h1>
+        <div id="typeBadges" class="badges"></div>
+        <p id="species"></p>
+        <p id="height"></p>
+        <p id="weight"></p>
+      </div>
+    </section>
 
-      <article class="card pokedex-card" id="pokedexSection">
+    <section class="grid two-col" id="pokedexRow">
+      <article class="card pokedex-card">
         <h2>Pokédex Entry</h2>
         <p id="pokedexEntry" class="dex-entry">Search for a Pokémon to view its Pokédex entry.</p>
         <div id="pokedexInfo" class="dex-info"></div>
       </article>
-
 
       <article class="card evolution-card" id="evolutionChainSection">
         <h2>Evolution Chain</h2>
         <p class="muted">Evolution path and requirements from PokéAPI.</p>
         <div id="evolutionChain" class="evolution-chain">Search for a Pokémon to view its evolution chain.</div>
       </article>
+    </section>
 
-
+    <section class="grid two-col" id="statsAbilitiesRow">
       <article class="card">
         <h2>Base Stats</h2>
         <div id="stats"></div>
         <h3>Total <span id="bst">0</span></h3>
       </article>
 
-      <article class="card">
+      <article class="card" id="abilitiesCard">
         <h2>Abilities</h2>
         <div id="abilities"></div>
       </article>
     </section>
 
-    <section class="grid mid-grid">
-      <article class="card" id="typeEffectiveness">
-        <h2>Type Effectiveness</h2>
-        <div id="typeMatchups" class="matchups detailed-matchups"></div>
-      </article>
+    <section class="card" id="typeEffectiveness">
+      <h2>Type Effectiveness</h2>
+      <div id="typeMatchups" class="matchups detailed-matchups"></div>
+    </section>
 
+    <section class="grid two-col">
       <article class="card" id="competitive">
         <h2>Competitive Analysis</h2>
         <p class="muted">Rule-based recommendations using base stats, typing, abilities, and move data.</p>
@@ -106,13 +111,46 @@
       </article>
     </section>
 
+    <section class="card" id="evIvBuilder">
+      <h2>EV / IV + Nature Builder</h2>
+      <p class="muted">Plan EVs, IVs, level, and nature to estimate final stats. These values can be carried into the Team Builder.</p>
 
-    
+      <div class="custom-grid custom-grid-small">
+        <label>Level <input id="calcLevel" type="number" min="1" max="100" value="100"></label>
+        <label>Nature <select id="natureSelect"></select></label>
+        <button id="resetEvIvBtn" type="button">Reset EV / IV Builder</button>
+      </div>
 
+      <h3>EVs</h3>
+      <p class="muted">Maximum total EVs: 510. Recommended practical max per stat: 252.</p>
+      <div class="custom-grid">
+        <label>HP EV <input id="evHP" type="number" min="0" max="252" value="0"></label>
+        <label>Attack EV <input id="evAttack" type="number" min="0" max="252" value="0"></label>
+        <label>Defense EV <input id="evDefense" type="number" min="0" max="252" value="0"></label>
+        <label>Sp. Attack EV <input id="evSpA" type="number" min="0" max="252" value="0"></label>
+        <label>Sp. Defense EV <input id="evSpD" type="number" min="0" max="252" value="0"></label>
+        <label>Speed EV <input id="evSpeed" type="number" min="0" max="252" value="0"></label>
+      </div>
+
+      <h3>IVs</h3>
+      <div class="custom-grid">
+        <label>HP IV <input id="ivHP" type="number" min="0" max="31" value="31"></label>
+        <label>Attack IV <input id="ivAttack" type="number" min="0" max="31" value="31"></label>
+        <label>Defense IV <input id="ivDefense" type="number" min="0" max="31" value="31"></label>
+        <label>Sp. Attack IV <input id="ivSpA" type="number" min="0" max="31" value="31"></label>
+        <label>Sp. Defense IV <input id="ivSpD" type="number" min="0" max="31" value="31"></label>
+        <label>Speed IV <input id="ivSpeed" type="number" min="0" max="31" value="31"></label>
+      </div>
+
+      <div id="evWarning" class="error hidden"></div>
+
+      <h3>Final Stat Estimate</h3>
+      <div id="finalStatsPanel" class="final-stats-grid"></div>
+    </section>
 
     <section class="card" id="customTeamInputs">
-      <h2>Custom Pokémon / Team Inputs</h2>
-      <p class="muted">Optional: override base stats, choose hidden ability, and assign a held item before adding a Pokémon to your team.</p>
+      <h2>Custom Team Inputs</h2>
+      <p class="muted">Optional: override displayed stats, choose ability, assign held item, and carry EV/IV/nature information into the team card.</p>
       <div class="custom-grid">
         <label>HP <input id="customHP" type="number" min="1" placeholder="Base"></label>
         <label>Attack <input id="customAttack" type="number" min="1" placeholder="Base"></label>
@@ -133,7 +171,7 @@
         <h2>Team Builder</h2>
         <span id="teamCount" class="score-pill">0 / 6</span>
       </div>
-      <p class="muted">Search a Pokémon, then click Add to Team.</p>
+      <p class="muted">Search a Pokémon, adjust details if desired, then click Add to Team.</p>
       <div id="teamSlots" class="team-grid"></div>
       <div class="team-buttons">
         <button id="clearTeamBtn">Clear Team</button>
@@ -196,7 +234,7 @@
       <textarea id="exportOutput" placeholder="Export output appears here." readonly></textarea>
     </section>
 
-    <footer>PokéAnalysis Sprint 5.1 True Replacement · Data from PokéAPI</footer>
+    <footer>PokéAnalysis Sprint 5.2 · EV / IV + Nature Builder · Data from PokéAPI</footer>
   </main>
 </div>
 <script src="js/app.js"></script>
