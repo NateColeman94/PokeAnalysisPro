@@ -64,7 +64,7 @@ function itemOf(p){let r=roleOf(p);if(p.types.includes("fire")&&p.types.includes
 function matchup(types){let g={"4x":[],"2x":[],"1x":[],"0.5x":[],"0.25x":[],"0x":[]};TYPES.forEach(a=>{let m=types.reduce((x,d)=>x*((CHART[a]&&CHART[a][d]!==undefined)?CHART[a][d]:1),1);if(m===4)g["4x"].push(a);else if(m===2)g["2x"].push(a);else if(m===1)g["1x"].push(a);else if(m===.5)g["0.5x"].push(a);else if(m===.25)g["0.25x"].push(a);else if(m===0)g["0x"].push(a)});return g}
 async function fetchPokemon(term){let r=await fetch(`${API_BASE}/pokemon/${norm(term)}`);if(!r.ok)throw new Error("Pokémon not found.");let p=await r.json();let sr=await fetch(p.species.url);let sp=sr.ok?await sr.json():{};let abilities=await Promise.all(p.abilities.map(async e=>{let d="No description available.";let ar=await fetch(e.ability.url);if(ar.ok){let a=await ar.json();let eff=a.effect_entries.find(x=>x.language.name==="en");if(eff)d=eff.short_effect}return{name:e.ability.name,hidden:e.is_hidden,description:d}}));let moves=await Promise.all(p.moves.slice(0,80).map(async e=>{let mr=await fetch(e.move.url);if(!mr.ok)return null;let m=await mr.json();let eff=m.effect_entries.find(x=>x.language.name==="en");return{name:m.name,type:m.type.name,category:m.damage_class.name,power:m.power,accuracy:m.accuracy,pp:m.pp,description:eff?eff.short_effect:""}}));let stats={};p.stats.forEach(x=>stats[x.stat.name]=x.base_stat);let flavor=sp.flavor_text_entries?.find(x=>x.language.name==="en"),genus=sp.genera?.find(x=>x.language.name==="en");let gr=sp.gender_rate,gender="Unknown";if(gr===-1)gender="Genderless";else if(gr!==undefined){let f=gr*12.5;gender=`Male ${(100-f).toFixed(1)}% / Female ${f.toFixed(1)}%`}const evolutionChain=await fetchEvolutionChain(sp);let obj={id:p.id,name:p.name,displayName:title(p.name),artwork:p.sprites.other?.["official-artwork"]?.front_default||p.sprites.front_default,shiny:p.sprites.other?.["official-artwork"]?.front_shiny||p.sprites.front_shiny,types:p.types.map(x=>x.type.name),height:p.height,weight:p.weight,species:genus?.genus||"Unknown Pokémon",description:clean(flavor?.flavor_text||""),generation:sp.generation?formatGeneration(sp.generation.name):"Unknown",habitat:sp.habitat?title(sp.habitat.name):"Unknown",captureRate:sp.capture_rate??"Unknown",baseFriendship:sp.base_happiness??"Unknown",hatchSteps:sp.hatch_counter!==undefined?sp.hatch_counter*255:"Unknown",legendary:sp.is_legendary?"Yes":"No",mythical:sp.is_mythical?"Yes":"No",stats:{hp:stats.hp||0,attack:stats.attack||0,defense:stats.defense||0,specialAttack:stats["special-attack"]||0,specialDefense:stats["special-defense"]||0,speed:stats.speed||0},abilities,moves:moves.filter(Boolean),genderText:gender,hasGenderDifferences:sp.has_gender_differences||false,evolutionChain};obj.role=roleOf(obj);return obj}
 async function runSearch(v){id("errorBox").classList.add("hidden");id("loading").classList.remove("hidden");try{render(await fetchPokemon(v))}catch(e){id("errorBox").textContent=e.message;id("errorBox").classList.remove("hidden")}finally{id("loading").classList.add("hidden")}}
-function render(p){currentPokemon=p;currentMoves=p.moves;id("officialArtwork").src=id("shinyToggle").checked&&p.shiny?p.shiny:p.artwork;id("pokemonName").textContent=p.displayName;id("dexNumber").textContent="#"+String(p.id).padStart(4,"0");id("typeBadges").innerHTML=p.types.map(badge).join("");id("species").textContent=p.species;id("height").textContent="Height: "+(p.height/10).toFixed(1)+" m";id("weight").textContent="Weight: "+(p.weight/10).toFixed(1)+" kg";renderDex(p);renderEvolution(p);renderStats(p);renderAbilities(p);renderTypes(p);renderForms(p);renderGender(p);renderComp(p);renderCustomInputs(p);renderEvIvBuilder(p);renderMoveFilters(p.moves);renderMoves(p.moves)}
+function render(p){currentPokemon=p;currentMoves=p.moves;id("officialArtwork").src=id("shinyToggle").checked&&p.shiny?p.shiny:p.artwork;id("pokemonName").textContent=p.displayName;id("dexNumber").textContent="#"+String(p.id).padStart(4,"0");id("typeBadges").innerHTML=p.types.map(badge).join("");id("species").textContent=p.species;id("height").textContent="Height: "+(p.height/10).toFixed(1)+" m";id("weight").textContent="Weight: "+(p.weight/10).toFixed(1)+" kg";renderDex(p);renderEvolution(p);renderStats(p);renderAbilities(p);renderTypes(p);renderForms(p);renderGender(p);renderComp(p);renderCustomInputs(p);renderEvIvBuilder(p);populateDamageMoves();populateDamageMoves();renderMoveFilters(p.moves);renderMoves(p.moves)}
 
 function renderEvolution(p){
   const container=id("evolutionChain");
@@ -337,7 +337,114 @@ function resetEvIvBuilder(){
   calculateFinalStats();
 }
 
+
+let currentDefender=null;
+
+function populateDamageMoves(){
+  const sel=id("damageMoveSelect");
+  if(!sel || !currentPokemon) return;
+  const moves=(currentPokemon.moves||[]).filter(m=>m.power).sort((a,b)=>(b.power||0)-(a.power||0)).slice(0,60);
+  sel.innerHTML=moves.map(m=>`<option value="${m.name}">${title(m.name)} (${title(m.type)}, ${m.power || "—"} BP)</option>`).join("");
+}
+
+async function loadDamageDefender(){
+  const name=id("defenderSearch")?.value || "";
+  if(!name.trim()){
+    alert("Enter a defender Pokémon.");
+    return;
+  }
+  try{
+    currentDefender=await fetchPokemon(name);
+    id("defenderPanel").innerHTML=`
+      <strong>${currentDefender.displayName}</strong>
+      <div>${currentDefender.types.map(badge).join("")}</div>
+      <p>HP: ${currentDefender.stats.hp} · Def: ${currentDefender.stats.defense} · SpD: ${currentDefender.stats.specialDefense}</p>
+    `;
+  }catch(e){
+    id("defenderPanel").innerHTML="<span class='bad'>Could not load defender.</span>";
+  }
+}
+
+function selectedDamageMove(){
+  const name=id("damageMoveSelect")?.value;
+  return (currentPokemon?.moves||[]).find(m=>m.name===name);
+}
+
+function typeEffectiveness(moveType, defenderTypes){
+  return defenderTypes.reduce((mult,type)=>mult*((CHART[moveType]&&CHART[moveType][type]!==undefined)?CHART[moveType][type]:1),1);
+}
+
+function calculateSimplifiedDamage(){
+  if(!currentPokemon || !currentDefender){
+    id("damageResult").innerHTML="Load an attacker and defender first.";
+    return;
+  }
+  const move=selectedDamageMove();
+  if(!move || !move.power){
+    id("damageResult").innerHTML="Choose a damaging move.";
+    return;
+  }
+
+  const attackerBuild=calculateFinalStats?.() || null;
+  const level=getNum("calcLevel",100);
+  const defenderLevel=Math.max(1,Math.min(100,getNum("defenderLevel",100)));
+  const attackStat=move.category==="physical"
+    ? (attackerBuild?.finalStats?.attack || currentPokemon.stats.attack)
+    : (attackerBuild?.finalStats?.specialAttack || currentPokemon.stats.specialAttack);
+  const defenseStat=move.category==="physical"
+    ? estimateDefenderStat(currentDefender.stats.defense, defenderLevel)
+    : estimateDefenderStat(currentDefender.stats.specialDefense, defenderLevel);
+
+  let modifier=1;
+  const stab=currentPokemon.types.includes(move.type)?1.5:1;
+  const effectiveness=typeEffectiveness(move.type,currentDefender.types);
+  modifier*=stab*effectiveness;
+
+  const weather=id("weatherSelect")?.value || "";
+  if(weather==="sun" && move.type==="fire") modifier*=1.5;
+  if(weather==="sun" && move.type==="water") modifier*=0.5;
+  if(weather==="rain" && move.type==="water") modifier*=1.5;
+  if(weather==="rain" && move.type==="fire") modifier*=0.5;
+
+  const screen=id("screenSelect")?.value || "";
+  if(screen==="reflect" && move.category==="physical") modifier*=0.5;
+  if(screen==="light-screen" && move.category==="special") modifier*=0.5;
+
+  if(id("critSelect")?.value==="crit") modifier*=1.5;
+
+  const baseDamage=((((2*level/5+2)*move.power*attackStat/defenseStat)/50)+2)*modifier;
+  const minDamage=Math.floor(baseDamage*0.85);
+  const maxDamage=Math.floor(baseDamage);
+  const defenderHP=estimateDefenderHP(currentDefender.stats.hp, defenderLevel);
+  const minPct=Math.round((minDamage/defenderHP)*100);
+  const maxPct=Math.round((maxDamage/defenderHP)*100);
+
+  let note="Neutral hit.";
+  if(effectiveness===0) note="No effect.";
+  else if(effectiveness>=4) note="Extremely effective: 4× weakness.";
+  else if(effectiveness>1) note="Super effective.";
+  else if(effectiveness<1) note="Not very effective.";
+
+  const koText=maxPct>=100 ? "Possible OHKO" : minPct>=50 ? "Likely 2HKO" : maxPct>=50 ? "Possible 2HKO" : "Likely 3HKO or more";
+
+  id("damageResult").innerHTML=`
+    <div class="damage-big">${minPct}% - ${maxPct}%</div>
+    <p class="damage-line"><strong>${currentPokemon.displayName}</strong> using <strong>${title(move.name)}</strong> vs <strong>${currentDefender.displayName}</strong></p>
+    <p class="damage-line">Estimated damage: ${minDamage} - ${maxDamage} HP out of ${defenderHP} HP</p>
+    <p class="damage-line">STAB: ${stab>1?"Yes":"No"} · Type multiplier: ${effectiveness}×</p>
+    <p class="damage-line">${note}</p>
+    <p class="damage-line"><strong>${koText}</strong></p>
+  `;
+}
+
+function estimateDefenderHP(base,level){
+  return Math.floor(((2*base+31+Math.floor(0/4))*level)/100)+level+10;
+}
+function estimateDefenderStat(base,level){
+  return Math.floor(((2*base+31+Math.floor(0/4))*level)/100)+5;
+}
+
 document.addEventListener("DOMContentLoaded",()=>{id("searchButton").onclick=()=>runSearch(id("pokemonSearch").value);id("pokemonSearch").onkeydown=e=>{if(e.key==="Enter")runSearch(id("pokemonSearch").value)};id("pokemonSearch").oninput=suggest;id("addTeamBtn").onclick=addToTeam;id("clearTeamBtn").onclick=clearTeam;id("saveTeamBtn").onclick=saveTeam;id("loadTeamBtn").onclick=loadTeam;id("csvBtn").onclick=exportCSV;id("jsonBtn").onclick=exportJSON;id("showdownBtn").onclick=exportShowdown;if(id("resetCustomBtn"))id("resetCustomBtn").onclick=resetCustomInputs;id("moveSearch").oninput=applyMoveFilters;id("typeFilter").onchange=applyMoveFilters;id("categoryFilter").onchange=applyMoveFilters;id("shinyToggle").onchange=()=>{id("shinyStatus").textContent=id("shinyToggle").checked?"ON":"OFF";if(currentPokemon)id("officialArtwork").src=id("shinyToggle").checked&&currentPokemon.shiny?currentPokemon.shiny:currentPokemon.artwork};id("themeToggle").onclick=()=>{document.body.classList.toggle("light");id("themeToggle").textContent=document.body.classList.contains("light")?"🌙 Dark":"☀️ Light"};
 ["calcLevel","natureSelect","evHP","evAttack","evDefense","evSpA","evSpD","evSpeed"].forEach(x=>{if(id(x)){id(x).oninput=calculateFinalStats;id(x).onchange=calculateFinalStats;}});
 if(id("resetEvIvBtn"))id("resetEvIvBtn").onclick=resetEvIvBuilder;
-runSearch("charizard");renderTeam()});
+if(id("loadDefenderBtn"))id("loadDefenderBtn").onclick=loadDamageDefender;if(id("calculateDamageBtn"))id("calculateDamageBtn").onclick=calculateSimplifiedDamage;runSearch("charizard");renderTeam()});

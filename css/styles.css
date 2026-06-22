@@ -204,3 +204,21 @@ body.light{--bg:#eef3fb;--panel:#ffffff;--panel2:#f4f7fb;--line:#cdd8e8;--text:#
 #customTeamInputs .custom-grid{
   grid-template-columns:repeat(auto-fit,minmax(240px,1fr));
 }
+
+
+/* ===== Sprint 5.3 Damage Calculator ===== */
+.damage-result{
+  background:var(--panel2);
+  border:1px solid var(--line);
+  border-radius:12px;
+  padding:14px;
+  margin-top:12px;
+}
+.damage-big{
+  font-size:2.2rem;
+  font-weight:900;
+  color:var(--yellow);
+}
+.damage-line{
+  margin:.4rem 0;
+}

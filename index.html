@@ -3,14 +3,14 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>PokéAnalysis Sprint 5.2.1</title>
+  <title>PokéAnalysis Sprint 5.3</title>
   <link rel="stylesheet" href="css/styles.css" />
 </head>
 <body>
 <div class="app">
   <aside class="sidebar">
     <div class="brand">⚪ PokéAnalysis<span>Pro</span></div>
-    <p>Sprint 5.2.1 · EV + Nature Cleanup</p>
+    <p>Sprint 5.3 · Damage Calculator</p>
     <nav>
       <a href="#pokemonOverview" class="active">Pokémon Overview</a>
       <a href="#pokedexRow">Pokédex Entry</a>
@@ -21,13 +21,14 @@
       <a href="#competitive">Competitive Analysis</a>
       <a href="#evIvBuilder">EV + Nature Builder</a>
       <a href="#customTeamInputs">Custom Team Inputs</a>
+      <a href="#damageCalculator">Damage Calculator</a>
       <a href="#teamBuilder">Team Builder</a>
       <a href="#teamAnalysis">Team Analysis</a>
       <a href="#moveDatabase">Move Database</a>
       <a href="#exports">Exports</a>
     </nav>
     <div class="about">
-      <strong>Sprint 5.2</strong>
+      <strong>Sprint 5.3</strong>
       <p>Cleaner layout, EV/nature tools, improved team details, and sidebar navigation in page order.</p>
     </div>
   </aside>
@@ -148,6 +149,46 @@
       </div>
     </section>
 
+
+    <section class="card" id="damageCalculator">
+      <h2>Damage Calculator</h2>
+      <p class="muted">Estimate damage using the current searched Pokémon as the attacker. This is a simplified class-project calculator, not a full Pokémon Showdown damage engine.</p>
+
+      <div class="custom-grid custom-grid-small">
+        <label>Attacker Move <select id="damageMoveSelect"></select></label>
+        <label>Defender Pokémon <input id="defenderSearch" placeholder="e.g. scizor, steelix, garchomp"></label>
+        <label>Defender Level <input id="defenderLevel" type="number" min="1" max="100" value="100"></label>
+        <button id="loadDefenderBtn" type="button">Load Defender</button>
+      </div>
+
+      <div class="custom-grid custom-grid-small">
+        <label>Weather
+          <select id="weatherSelect">
+            <option value="">None</option>
+            <option value="sun">Sun</option>
+            <option value="rain">Rain</option>
+          </select>
+        </label>
+        <label>Screen
+          <select id="screenSelect">
+            <option value="">None</option>
+            <option value="reflect">Reflect</option>
+            <option value="light-screen">Light Screen</option>
+          </select>
+        </label>
+        <label>Critical Hit
+          <select id="critSelect">
+            <option value="">No</option>
+            <option value="crit">Yes</option>
+          </select>
+        </label>
+        <button id="calculateDamageBtn" type="button">Calculate Damage</button>
+      </div>
+
+      <div id="defenderPanel" class="mini-card">No defender loaded yet.</div>
+      <div id="damageResult" class="damage-result">Choose a move, load a defender, then calculate damage.</div>
+    </section>
+
     <section class="card" id="teamBuilder">
       <div class="card-head">
         <h2>Team Builder</h2>
@@ -216,7 +257,7 @@
       <textarea id="exportOutput" placeholder="Export output appears here." readonly></textarea>
     </section>
 
-    <footer>PokéAnalysis Sprint 5.2.1 · EV + Nature Builder · Data from PokéAPI</footer>
+    <footer>PokéAnalysis Sprint 5.3 · EV + Nature Builder · Data from PokéAPI</footer>
   </main>
 </div>
 <script src="js/app.js"></script>
