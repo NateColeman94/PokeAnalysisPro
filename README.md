@@ -1,19 +1,32 @@
-# PokéAnalysis Sprint 5.8C Item Dropdown
+# PokéAnalysis Sprint 5.8D Gold Build
 
 Upload only:
 - index.html
 - README.md
 
-Includes:
-- Sprint 5.8B Competitive Intelligence features
-- Held item dropdown options
-- Full Pokédex panel
-- Competitive Analysis restoration
-- Threat Score / Battle Planner restoration
-- Team Core Analyzer 3.0
-- Team grades and coach notes
-- No export section
-- Theme toggle, shiny toggle, autocomplete, and damage calculator fixes
+Built from the working Sprint 5.8B version.
 
-Important:
-If the live site still shows "No Export Build" or "Sprint 5.3", GitHub Pages is still serving an older uploaded index.html. Upload this index.html and hard-refresh with Ctrl+F5.
+Kept from 5.8B:
+- Full Pokédex panel
+- Complete Competitive Analysis
+- Threat Score / Battle Planner intelligence
+- Team Core Analyzer 3.0
+- Team grades
+- Weakness heat map
+- Speed tier report
+- Win condition finder
+- AI Coach notes
+- Competitive Mode selector
+- Full official Mega Evolution database
+- Theme toggle fix
+- Shiny toggle fix
+- Autocomplete fix
+- Damage Calculator fix
+- No export section
+
+Added:
+- Held item dropdown
+- Custom Item option
+- Recommended item auto-selection
+- Ability dropdown preserved
+- Single-file upload format preserved
