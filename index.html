@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>PokéAnalysis Sprint 5.8 Restoration</title>
+<title>PokéAnalysis Sprint 5.8B Competitive Intelligence</title>
 <style>
 :root{--bg:#07111f;--panel:#0e1b2d;--panel2:#111f33;--line:#26364d;--text:#f6f8ff;--muted:#aab6c7;--purple:#6b38e8;--green:#5fd16d;--red:#ff5d5d;--yellow:#ffcb05}
 body.light{--bg:#eef3fb;--panel:#fff;--panel2:#f4f7fb;--line:#cdd8e8;--text:#172033;--muted:#5d6a7d}
@@ -32,12 +32,20 @@ footer{text-align:center;margin:25px 0}
 .heat-row{display:grid;grid-template-columns:85px 1fr 45px;gap:8px;align-items:center;margin:5px 0}
 .heat-bar{height:12px;background:#223650;border-radius:999px;overflow:hidden}
 .heat-fill{height:100%;background:linear-gradient(90deg,#65d55d,#ffcb05,#ff7171)}
+
+.coach-note{background:var(--panel2);border-left:5px solid var(--yellow);border-radius:10px;padding:12px;margin:10px 0}
+.grade-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
+.tier-list{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px}
+.threat-db-card{background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:12px;margin:8px 0}
+.battle-plan-step{background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:10px;margin:8px 0}
+.mode-pill{display:inline-block;padding:5px 9px;border-radius:999px;background:#203352;color:white;font-weight:900;margin:4px}
+
 </style>
 </head>
 <body>
 <div class="app">
 <aside class="sidebar">
-<div class="brand">⚪ PokéAnalysis<span>Pro</span></div><p>Sprint 5.8 Feature Restoration</p>
+<div class="brand">⚪ PokéAnalysis<span>Pro</span></div><p>Sprint 5.8B Competitive Intelligence</p>
 <nav>
 <a href="#overview" class="active">Pokémon Overview</a><a href="#pokedex">Pokédex Entry</a><a href="#evolution">Evolution Chain</a><a href="#stats">Base Stats</a><a href="#typeEffect">Type Effectiveness</a><a href="#competitive">Competitive Analysis</a><a href="#evBuilder">EV + Nature Builder</a><a href="#damage">Damage Calculator</a><a href="#battle">Battle Planner</a><a href="#core">Team Core Analyzer</a><a href="#teamBuilder">Team Builder</a><a href="#moves">Move Database</a>
 </nav>
@@ -45,7 +53,7 @@ footer{text-align:center;margin:25px 0}
 <main class="main">
 <header class="topbar" id="overview">
 <div class="search-wrap"><input id="pokemonSearch" placeholder="Search Pokémon..." autocomplete="off"><div id="suggestions" class="suggestions hidden"></div></div>
-<button id="searchButton">Analyze</button><button id="addTeamBtn" class="success">Add to Team</button><button id="themeToggle" class="theme-toggle">☀️ Light</button>
+<button id="searchButton">Analyze</button><select id="formatSelect" title="Competitive Format"><option value="singles-ou">Singles OU</option><option value="vgc">VGC Doubles</option><option value="battle-stadium">Battle Stadium</option><option value="draft">Draft League</option><option value="casual">Casual</option><option value="ubers">Ubers</option></select><button id="addTeamBtn" class="success">Add to Team</button><button id="themeToggle" class="theme-toggle">☀️ Light</button>
 <label class="toggle"><span>Shiny</span><input id="shinyToggle" type="checkbox"><b></b><small id="shinyStatus">OFF</small></label>
 </header>
 <div id="loading" class="mini-card hidden">Loading Pokémon data...</div><div id="errorBox" class="mini-card bad hidden"></div>
@@ -58,11 +66,11 @@ footer{text-align:center;margin:25px 0}
 <section class="card"><h2>Team Build Options</h2><div class="custom-grid custom-grid-small"><label>Selected Ability<select id="customAbility"></select></label><label>Held Item<input id="customItem" placeholder="e.g. Leftovers"></label></div></section>
 <section class="card" id="damage"><h2>Damage Calculator</h2><div class="custom-grid custom-grid-small"><label>Attacker Move<select id="damageMoveSelect"></select></label><label>Defender Pokémon<input id="defenderSearch" placeholder="e.g. scizor"></label><label>Defender Level<input id="defenderLevel" type="number" min="1" max="100" value="50"></label><button id="loadDefenderBtn">Load Defender</button></div><div class="custom-grid custom-grid-small"><label>Weather<select id="weatherSelect"><option value="">None</option><option value="sun">Sun</option><option value="rain">Rain</option></select></label><label>Screen<select id="screenSelect"><option value="">None</option><option value="reflect">Reflect</option><option value="light-screen">Light Screen</option></select></label><label>Critical Hit<select id="critSelect"><option value="">No</option><option value="crit">Yes</option></select></label><button id="calculateDamageBtn">Calculate Damage</button></div><div id="defenderPanel" class="mini-card">No defender loaded yet.</div><div id="damageResult" class="damage-result">Choose a move, load a defender, then calculate damage.</div></section>
 <section class="card" id="battle"><h2>Battle Planner</h2><div class="custom-grid custom-grid-small"><label>Opponent Pokémon<div class="search-wrap"><input id="opponentInput" placeholder="e.g. garchomp" autocomplete="off"><div id="opponentSuggestions" class="suggestions hidden"></div></div></label><button id="addOpponentBtn">Add Opponent</button><button id="clearOpponentBtn">Clear Opponent Team</button><button id="analyzeBattleBtn">Analyze Battle</button></div><div class="grid two-col"><article class="mini-card"><h3>Your Team</h3><div id="battleYourTeam">Add Pokémon to your team first.</div></article><article class="mini-card"><h3>Opponent Team</h3><div id="opponentTeamSlots">No opponent Pokémon added yet.</div></article></div><div id="battlePlanResult" class="battle-plan-result">Add your team and opponent Pokémon, then click Analyze Battle.</div></section>
-<section class="card" id="core"><h2>Team Core Analyzer 2.0</h2><button id="analyzeCoreBtn">Analyze Team Cores</button><div id="teamCoreResult" class="battle-plan-result">Add Pokémon to your team, then click Analyze Team Cores.</div></section>
+<section class="card" id="core"><h2>Team Core Analyzer 3.0</h2><button id="analyzeCoreBtn">Analyze Team Cores</button><div id="teamCoreResult" class="battle-plan-result">Add Pokémon to your team, then click Analyze Team Cores for grades, heat map, speed tiers, support profile, and coach notes.</div></section>
 <section class="card" id="teamBuilder"><div style="display:flex;justify-content:space-between"><h2>Team Builder</h2><span id="teamCount" class="score-chip">0 / 6</span></div><div id="teamSlots" class="team-grid"></div><div class="team-buttons"><button id="clearTeamBtn">Clear Team</button><button id="saveTeamBtn">Save Team</button><button id="loadTeamBtn">Load Saved Team</button></div></section>
 <section class="grid analysis-grid"><article class="card"><h2>Advanced Team Score</h2><div id="teamScore" class="big-score">—</div><div id="teamSummary"></div></article><article class="card"><h2>Defensive Coverage</h2><div id="teamWeaknesses"></div></article><article class="card"><h2>Type Coverage & Speed</h2><div id="teamStats"></div></article><article class="card"><h2>Role Balance & Suggestions</h2><div id="teamRoles"></div></article></section>
 <section class="grid move-grid" id="moves"><article class="card"><h2>Move Database</h2><div class="custom-grid custom-grid-small"><input id="moveSearch" placeholder="Search moves..."><select id="typeFilter"><option value="">All Types</option></select><select id="categoryFilter"><option value="">All Categories</option></select></div><div class="table-wrap"><table><thead><tr><th>Move</th><th>Type</th><th>Category</th><th>Power</th><th>Accuracy</th><th>PP</th></tr></thead><tbody id="movesBody"></tbody></table></div></article><article class="card"><h2>Move Details</h2><div id="moveDetails">Select a move to view details.</div></article></section>
-<footer>PokéAnalysis Sprint 5.8 Restoration · Data from PokéAPI</footer>
+<footer>PokéAnalysis Sprint 5.8B Competitive Intelligence · Data from PokéAPI</footer>
 </main></div>
 <script>
 const API_BASE="https://pokeapi.co/api/v2";
@@ -273,11 +281,155 @@ function analyzeBattle(){
 
     <h3>Win Condition Ideas</h3>
     ${wins.length?wins.map(w=>`<div class="mini-card"><b>${w.pokemon.displayName}</b><p>${w.reason}</p></div>`).join(""):"<p>No clear offensive win condition detected yet.</p>"}
+    ${generateBattlePlanSteps()}
   `;
 }
 function hasMove(names){return team.some(p=>(p.moves||[]).some(m=>names.includes(m.name)))}
-function analyzeCores(){if(!team.length){id("teamCoreResult").textContent="Add Pokémon to your team first.";return}let types=new Set(team.flatMap(p=>p.types)),cores=[],notes=[];if(types.has("fire")&&types.has("water")&&types.has("grass"))cores.push(["Fire / Water / Grass Core",90,"Strong classic balance core."]);if(types.has("dragon")&&types.has("fairy")&&types.has("steel"))cores.push(["Dragon / Fairy / Steel Core",92,"Excellent resistance triangle."]);if(hasMove(["u-turn","volt-switch","flip-turn"]))cores.push(["Pivot / VoltTurn Core",75,"Team has momentum tools."]);if(hasMove(["stealth-rock","spikes","toxic-spikes","sticky-web"]))cores.push(["Hazard Stack",80,"Team can pressure switches with hazards."]);if(hasMove(["rapid-spin","defog","court-change"]))cores.push(["Hazard Removal",78,"Team has removal support."]);if(hasMove(["will-o-wisp","thunder-wave","toxic","sleep-powder","spore"]))cores.push(["Status Support",75,"Team can disrupt opponents."]);if(hasMove(["recover","roost","slack-off","soft-boiled","wish","synthesis"]))cores.push(["Recovery Support",75,"Team has long-game tools."]);let fast=team.filter(p=>(p.ev?.finalStats?.speed||p.stats.speed)>=120).length,bulky=team.filter(p=>["Defensive Tank","Balanced"].includes(p.role)).length;if(fast>=3)cores.push(["Hyper Offense Lean",70,"Multiple fast attackers."]);if(bulky>=3)cores.push(["Balance / Bulky Offense Lean",70,"Several bulky or balanced Pokémon."]);if(!hasMove(["rapid-spin","defog","court-change"]))notes.push("Consider hazard removal.");if(!hasMove(["stealth-rock","spikes","toxic-spikes","sticky-web"]))notes.push("Consider adding entry hazards.");if(fast===0)notes.push("Consider a fast revenge killer or priority user.");id("teamCoreResult").innerHTML=`<h3>Detected Cores</h3>${cores.length?cores.map(c=>`<div class="mini-card"><span class="core-tag">${c[0]}</span><p>Confidence: ${c[1]}%</p><p>${c[2]}</p></div>`).join(""):"<p>No major core detected yet.</p>"}<h3>Recommendations</h3>${notes.length?notes.map(n=>`<p>• ${n}</p>`).join(""):"<p class='good'>Team has a useful mix of structure and support.</p>"}`}
+
+const SPEED_TIERS=[
+  ["Regieleki",200],["Dragapult",142],["Zeraora",143],["Flutter Mane",135],["Chien-Pao",135],
+  ["Iron Bundle",136],["Greninja",122],["Cinderace",119],["Garchomp",102],["Charizard",100],
+  ["Great Tusk",87],["Gholdengo",84],["Landorus-T",91],["Kingambit",50],["Ting-Lu",45]
+];
+const THREAT_DB={
+  dragapult:["Very high Speed tier","Ghost/Dragon pressure","Often forces revenge-kill planning"],
+  garchomp:["Strong Ground STAB","Punishes Steel and Fire types","Can sweep or wallbreak"],
+  kingambit:["Dangerous late-game cleaner","Strong priority pressure","Dark/Steel typing creates switch pressure"],
+  "great-tusk":["Ground/Fighting coverage","Hazard removal and physical pressure","Strong into many Steel/Rock cores"],
+  heatran:["Fire/Steel typing","Punishes Fairy and Steel teams","Can trap or set hazards"],
+  "landorus-therian":["Ground immunity","Intimidate pivot","Stealth Rock and U-turn utility"],
+  gholdengo:["Blocks hazard removal","Strong Ghost/Steel pressure","Difficult utility matchup"],
+  "iron-valiant":["Mixed attacking threat","Fast offensive pressure","Coverage can be hard to switch into"],
+  "flutter-mane":["Very high special pressure","Ghost/Fairy coverage","Outspeeds many teams"],
+  incineroar:["Intimidate support","Fake Out and pivoting","Strong VGC utility profile"]
+};
+function selectedFormat(){
+  return id("formatSelect")?.value || "singles-ou";
+}
+function gradeText(score){return score>=93?"A+":score>=90?"A":score>=87?"A-":score>=83?"B+":score>=80?"B":score>=77?"B-":score>=73?"C+":score>=70?"C":score>=65?"C-":"D";}
+function teamTypes(){return new Set(team.flatMap(p=>p.types));}
+function teamHasMove(names){return team.some(p=>(p.moves||[]).some(m=>names.includes(m.name)));}
+function teamWeaknessCounts(){
+  let w={};
+  team.forEach(p=>[...matchup(p.types)["4x"],...matchup(p.types)["2x"]].forEach(t=>w[t]=(w[t]||0)+1));
+  return w;
+}
+function offensiveCoverageMap(){
+  let covered=new Set();
+  team.forEach(p=>(p.moves||[]).filter(m=>m.power).slice(0,60).forEach(m=>{
+    TYPES.forEach(t=>{if(typeEffectiveness(m.type,[t])>1)covered.add(t);});
+  }));
+  return {covered,missing:TYPES.filter(t=>!covered.has(t))};
+}
+function supportProfile(){
+  return {
+    hazards:teamHasMove(["stealth-rock","spikes","toxic-spikes","sticky-web"]),
+    removal:teamHasMove(["rapid-spin","defog","court-change"]),
+    status:teamHasMove(["will-o-wisp","thunder-wave","toxic","sleep-powder","spore"]),
+    recovery:teamHasMove(["recover","roost","slack-off","soft-boiled","wish","synthesis","moonlight","morning-sun"]),
+    pivot:teamHasMove(["u-turn","volt-switch","flip-turn","parting-shot"]),
+    setup:teamHasMove(["swords-dance","nasty-plot","dragon-dance","calm-mind","bulk-up","quiver-dance"]),
+    priority:teamHasMove(["extreme-speed","sucker-punch","bullet-punch","aqua-jet","ice-shard","mach-punch","shadow-sneak"])
+  };
+}
+function speedTierReport(){
+  const fastest=team.map(p=>({name:p.displayName,speed:p.ev?.finalStats?.speed||p.stats.speed})).sort((a,b)=>b.speed-a.speed)[0];
+  if(!fastest)return {fastest:null,outspeeds:[],loses:[]};
+  return {
+    fastest,
+    outspeeds:SPEED_TIERS.filter(([,s])=>fastest.speed>s).slice(0,6),
+    loses:SPEED_TIERS.filter(([,s])=>fastest.speed<s).slice(0,6)
+  };
+}
+function winConditionFinder(){
+  const candidates=team.map(p=>{
+    let setup=(p.moves||[]).some(m=>["swords-dance","nasty-plot","dragon-dance","calm-mind","quiver-dance","bulk-up"].includes(m.name));
+    let speed=p.ev?.finalStats?.speed||p.stats.speed;
+    let offensive=["Physical Sweeper","Special Sweeper","Fast Utility"].includes(p.role);
+    let score=(offensive?35:10)+(setup?30:0)+(speed>=100?20:0)+(p.stats.attack>=110||p.stats.specialAttack>=110?15:0);
+    return {pokemon:p,score,setup,offensive,speed};
+  }).sort((a,b)=>b.score-a.score);
+  return candidates.slice(0,3);
+}
+function coachNotes(){
+  let notes=[],w=teamWeaknessCounts(),support=supportProfile(),coverage=offensiveCoverageMap(),speed=speedTierReport();
+  Object.entries(w).filter(([,c])=>c>=3).forEach(([t,c])=>notes.push(`${c} Pokémon share a ${title(t)} weakness. Add a resist, immunity, or change one team member to reduce matchup pressure.`));
+  if(!support.removal)notes.push("Your team lacks hazard removal. Consider Rapid Spin, Defog, or Court Change support.");
+  if(!support.hazards)notes.push("Your team lacks entry hazards. Stealth Rock or Spikes would improve long-game pressure.");
+  if(!support.pivot)notes.push("Your team lacks pivoting moves. U-turn, Volt Switch, or Flip Turn can improve momentum.");
+  if(coverage.missing.length>=6)notes.push(`Your offensive coverage misses several types: ${coverage.missing.slice(0,6).map(title).join(", ")}.`);
+  if(speed.fastest && speed.loses.length>=4)notes.push(`${speed.fastest.name} is your fastest Pokémon, but it still loses to several common speed tiers like ${speed.loses.slice(0,3).map(x=>x[0]).join(", ")}.`);
+  if(!notes.length)notes.push("Your team has a solid structure in this model. Focus next on matchup-specific preparation.");
+  return notes;
+}
+function formatModeAdvice(){
+  const f=selectedFormat();
+  if(f==="vgc")return"VGC mode emphasizes speed control, Fake Out/pivot support, defensive synergy, and double-target pressure.";
+  if(f==="draft")return"Draft mode emphasizes opponent-specific prep, flexible roles, and matchup coverage over generic ladder consistency.";
+  if(f==="casual")return"Casual mode gives more weight to balanced coverage and lower complexity recommendations.";
+  if(f==="ubers")return"Ubers mode expects higher power levels and stronger speed/threat pressure.";
+  return"Singles mode emphasizes hazards, removal, speed control, win conditions, and safe switch planning.";
+}
+
+function analyzeCores(){
+  if(!team.length){id("teamCoreResult").textContent="Add Pokémon to your team first.";return}
+  const types=teamTypes(),support=supportProfile(),coverage=offensiveCoverageMap(),speed=speedTierReport(),wins=winConditionFinder(),notes=coachNotes();
+  const scores={
+    offense:Math.round(coverage.covered.size/TYPES.length*100),
+    defense:defensiveCoverageScore(),
+    speed:speedScore(),
+    hazards:(support.hazards?50:0)+(support.removal?50:0),
+    utility:Object.values(support).filter(Boolean).length*14,
+    recovery:support.recovery?85:45,
+    pivoting:support.pivot?85:45,
+    status:support.status?85:45
+  };
+  const overall=Math.round(scores.offense*.18+scores.defense*.22+scores.speed*.15+scores.hazards*.12+scores.utility*.13+scores.recovery*.08+scores.pivoting*.07+scores.status*.05);
+  let cores=[];
+  if(types.has("fire")&&types.has("water")&&types.has("grass"))cores.push(["Fire / Water / Grass",92,"Strong classic defensive/offensive balance."]);
+  if(types.has("dragon")&&types.has("fairy")&&types.has("steel"))cores.push(["Dragon / Fairy / Steel",94,"Excellent resistance triangle."]);
+  if(support.pivot)cores.push(["VoltTurn / Pivot Core",80,"Momentum tools detected."]);
+  if(support.hazards)cores.push(["Hazard Stack",82,"Entry hazard pressure detected."]);
+  if(support.removal)cores.push(["Hazard Control",78,"Removal support detected."]);
+  if(support.status)cores.push(["Status Support",75,"Disruption tools detected."]);
+  if(support.setup)cores.push(["Setup Win Condition",76,"Setup moves detected."]);
+  if(team.filter(p=>(p.ev?.finalStats?.speed||p.stats.speed)>=120).length>=3)cores.push(["Hyper Offense Lean",78,"Multiple high-speed Pokémon."]);
+  if(team.filter(p=>["Defensive Tank","Balanced"].includes(p.role)).length>=3)cores.push(["Balance / Bulky Offense Lean",76,"Several bulky or balanced roles."]);
+
+  const weak=teamWeaknessCounts();
+  id("teamCoreResult").innerHTML=`
+    <p><span class="mode-pill">Mode: ${title(selectedFormat())}</span> ${formatModeAdvice()}</p>
+    <h3>Overall Team Grade: ${gradeText(overall)} (${overall}/100)</h3>
+    <div class="grade-grid">${Object.entries(scores).map(([k,v])=>`<div class="grade-card"><b>${title(k)}</b><div class="grade-letter">${gradeText(v)}</div><p>${v}/100</p></div>`).join("")}</div>
+    <h3>Detected Cores</h3>
+    ${cores.length?cores.map(c=>`<div class="mini-card"><span class="core-tag">${c[0]}</span><p>Confidence: ${c[1]}%</p><p>${c[2]}</p></div>`).join(""):"<p>No major classic core detected yet.</p>"}
+    <h3>Weakness Heat Map</h3>
+    ${Object.entries(weak).sort((a,b)=>b[1]-a[1]).map(([t,c])=>`<div class="heat-row"><span>${title(t)}</span><div class="heat-bar"><div class="heat-fill" style="width:${Math.min(100,c/team.length*100)}%"></div></div><b>${c}</b></div>`).join("")||"<p>No major weakness stack detected.</p>"}
+    <h3>Offensive Coverage</h3>
+    <p>Covered effectively: ${coverage.covered.size}/${TYPES.length} types.</p>
+    <p>Missing effective coverage: ${coverage.missing.length?coverage.missing.map(title).join(", "):"None detected."}</p>
+    <h3>Speed Tier Report</h3>
+    ${speed.fastest?`<p>Fastest member: <b>${speed.fastest.name}</b> at estimated Speed ${speed.fastest.speed}.</p><div class="tier-list"><div class="mini-card"><b>Outspeeds</b>${speed.outspeeds.map(x=>`<p>✓ ${x[0]} (${x[1]})</p>`).join("")||"<p>None from benchmark list.</p>"}</div><div class="mini-card"><b>Outsped By</b>${speed.loses.map(x=>`<p class="bad">✗ ${x[0]} (${x[1]})</p>`).join("")||"<p class='good'>No listed benchmark outspeeds your fastest member.</p>"}</div></div>`:"<p>No speed data.</p>"}
+    <h3>Win Condition Finder</h3>
+    ${wins.map((w,i)=>`<div class="mini-card"><b>${i===0?"Primary":"Secondary"} Win Condition: ${w.pokemon.displayName}</b><p>Confidence: ${Math.min(99,w.score)}%</p><p>${w.setup?"Setup option detected. ":""}${w.offensive?"Offensive profile detected. ":""}Speed: ${w.speed}</p></div>`).join("")}
+    <h3>AI Coach Notes</h3>
+    ${notes.map(n=>`<div class="coach-note">${n}</div>`).join("")}
+  `;
+}
 document.addEventListener("DOMContentLoaded",()=>{setupNature();id("themeToggle").onclick=()=>{document.body.classList.toggle("light");id("themeToggle").textContent=document.body.classList.contains("light")?"🌙 Dark":"☀️ Light"};id("shinyToggle").onchange=()=>{id("shinyStatus").textContent=id("shinyToggle").checked?"ON":"OFF";if(currentPokemon)id("officialArtwork").src=id("shinyToggle").checked&&currentPokemon.shiny?currentPokemon.shiny:currentPokemon.artwork};id("searchButton").onclick=()=>runSearch(id("pokemonSearch").value);id("pokemonSearch").onkeydown=e=>{if(e.key==="Enter")runSearch(id("pokemonSearch").value)};id("pokemonSearch").oninput=()=>suggest("pokemonSearch","suggestions");id("opponentInput").oninput=()=>suggest("opponentInput","opponentSuggestions");id("addTeamBtn").onclick=addToTeam;id("clearTeamBtn").onclick=()=>{team=[];renderTeam()};id("saveTeamBtn").onclick=()=>localStorage.setItem("team",JSON.stringify(team.map(p=>p.name)));id("loadTeamBtn").onclick=async()=>{let names=JSON.parse(localStorage.getItem("team")||"[]");team=[];for(let n of names)team.push(await fetchPokemon(n));renderTeam()};["calcLevel","natureSelect","evHP","evAttack","evDefense","evSpA","evSpD","evSpeed"].forEach(x=>id(x).oninput=()=>currentPokemon&&renderEV());id("resetEvBtn").onclick=()=>{["evHP","evAttack","evDefense","evSpA","evSpD","evSpeed"].forEach(x=>id(x).value=0);id("calcLevel").value=50;renderEV()};id("moveSearch").oninput=applyMoveFilters;id("typeFilter").onchange=applyMoveFilters;id("categoryFilter").onchange=applyMoveFilters;id("loadDefenderBtn").onclick=loadDefender;id("calculateDamageBtn").onclick=calcDamage;id("addOpponentBtn").onclick=addOpponent;id("clearOpponentBtn").onclick=()=>{opponentTeam=[];renderBattleTeams()};id("analyzeBattleBtn").onclick=analyzeBattle;id("analyzeCoreBtn").onclick=analyzeCores;runSearch("charizard");renderTeam()});
+
+function generateBattlePlanSteps(){
+  if(!team.length||!opponentTeam.length)return "";
+  const lead=bestLeadOptions?.()[0]?.pokemon || team[0];
+  const win=winConditionFinder?.()[0]?.pokemon || team[0];
+  const top=opponentTeam.map(o=>({pokemon:o,breakdown:threatBreakdown(o)})).sort((a,b)=>b.breakdown.overall-a.breakdown.overall)[0]?.pokemon;
+  return `<h3>AI Battle Plan</h3>
+    <div class="battle-plan-step"><b>Step 1:</b> Consider leading ${lead.displayName} to create early pressure or momentum.</div>
+    <div class="battle-plan-step"><b>Step 2:</b> Watch for ${top?top.displayName:"the opponent's top threat"} and preserve your safest switch option.</div>
+    <div class="battle-plan-step"><b>Step 3:</b> Use hazards, pivots, or status to create chip damage before attempting a sweep.</div>
+    <div class="battle-plan-step"><b>Step 4:</b> Preserve ${win.displayName} as a likely win condition for the mid-to-late game.</div>`;
+}
+
 </script>
 </body>
 </html>
