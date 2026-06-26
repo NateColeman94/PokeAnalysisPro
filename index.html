@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>PokéAnalysis Clean Fixed Build v2</title>
+<title>PokéAnalysis Clean Fixed Build v3</title>
 <style>
 :root{--bg:#07111f;--panel:#0e1b2d;--panel2:#111f33;--line:#26364d;--text:#f6f8ff;--muted:#aab6c7;--purple:#6b38e8;--green:#5fd16d;--red:#ff5d5d;--yellow:#ffcb05}
 body.light{--bg:#eef3fb;--panel:#fff;--panel2:#f4f7fb;--line:#cdd8e8;--text:#172033;--muted:#5d6a7d}
@@ -29,7 +29,7 @@ footer{text-align:center;margin:25px 0}
 <body>
 <div class="app">
 <aside class="sidebar">
-<div class="brand">⚪ PokéAnalysis<span>Pro</span></div><p>Clean Fixed No Export Build v2</p>
+<div class="brand">⚪ PokéAnalysis<span>Pro</span></div><p>Clean Fixed No Export Build v3</p>
 <nav>
 <a href="#overview" class="active">Pokémon Overview</a><a href="#pokedex">Pokédex Entry</a><a href="#evolution">Evolution Chain</a><a href="#stats">Base Stats</a><a href="#typeEffect">Type Effectiveness</a><a href="#competitive">Competitive Analysis</a><a href="#evBuilder">EV + Nature Builder</a><a href="#damage">Damage Calculator</a><a href="#battle">Battle Planner</a><a href="#core">Team Core Analyzer</a><a href="#teamBuilder">Team Builder</a><a href="#moves">Move Database</a>
 </nav>
@@ -54,7 +54,7 @@ footer{text-align:center;margin:25px 0}
 <section class="card" id="teamBuilder"><div style="display:flex;justify-content:space-between"><h2>Team Builder</h2><span id="teamCount" class="score-chip">0 / 6</span></div><div id="teamSlots" class="team-grid"></div><div class="team-buttons"><button id="clearTeamBtn">Clear Team</button><button id="saveTeamBtn">Save Team</button><button id="loadTeamBtn">Load Saved Team</button></div></section>
 <section class="grid analysis-grid"><article class="card"><h2>Advanced Team Score</h2><div id="teamScore" class="big-score">—</div><div id="teamSummary"></div></article><article class="card"><h2>Defensive Coverage</h2><div id="teamWeaknesses"></div></article><article class="card"><h2>Type Coverage & Speed</h2><div id="teamStats"></div></article><article class="card"><h2>Role Balance & Suggestions</h2><div id="teamRoles"></div></article></section>
 <section class="grid move-grid" id="moves"><article class="card"><h2>Move Database</h2><div class="custom-grid custom-grid-small"><input id="moveSearch" placeholder="Search moves..."><select id="typeFilter"><option value="">All Types</option></select><select id="categoryFilter"><option value="">All Categories</option></select></div><div class="table-wrap"><table><thead><tr><th>Move</th><th>Type</th><th>Category</th><th>Power</th><th>Accuracy</th><th>PP</th></tr></thead><tbody id="movesBody"></tbody></table></div></article><article class="card"><h2>Move Details</h2><div id="moveDetails">Select a move to view details.</div></article></section>
-<footer>PokéAnalysis Clean Fixed Build v2 · Data from PokéAPI</footer>
+<footer>PokéAnalysis Clean Fixed Build v3 · Data from PokéAPI</footer>
 </main></div>
 <script>
 const API_BASE="https://pokeapi.co/api/v2";
@@ -67,11 +67,38 @@ const id=x=>document.getElementById(x), title=t=>String(t||"").replace(/-/g," ")
 function clean(t){return String(t||"").replace(/\n|\f/g," ")}function roleOf(p){let s=p.stats;if(s.attack>=115&&s.speed>=95)return"Physical Sweeper";if(s.specialAttack>=115&&s.speed>=95)return"Special Sweeper";if(s.hp>=90&&(s.defense>=100||s.specialDefense>=100))return"Defensive Tank";if(s.speed>=110)return"Fast Utility";return"Balanced"}function itemOf(p){return p.types.includes("fire")&&p.types.includes("flying")?"Heavy-Duty Boots":roleOf(p).includes("Sweeper")?"Life Orb":"Leftovers"}
 function typeEffectiveness(mt,defs){return defs.reduce((m,d)=>m*((CHART[mt]&&CHART[mt][d]!==undefined)?CHART[mt][d]:1),1)}
 function matchup(types){let g={"4x":[],"2x":[],"1x":[],"0.5x":[],"0.25x":[],"0x":[]};TYPES.forEach(a=>{let m=typeEffectiveness(a,types);if(m===4)g["4x"].push(a);else if(m===2)g["2x"].push(a);else if(m===1)g["1x"].push(a);else if(m===.5)g["0.5x"].push(a);else if(m===.25)g["0.25x"].push(a);else if(m===0)g["0x"].push(a)});return g}
-async function fetchPokemon(term){let r=await fetch(`${API_BASE}/pokemon/${norm(term)}`);if(!r.ok)throw Error("Pokémon not found.");let p=await r.json(),sr=await fetch(p.species.url),sp=sr.ok?await sr.json():{};let abilities=await Promise.all(p.abilities.map(async e=>{let d="No description available.";let ar=await fetch(e.ability.url);if(ar.ok){let a=await ar.json(),eff=a.effect_entries.find(x=>x.language.name==="en");if(eff)d=eff.short_effect}return{name:e.ability.name,hidden:e.is_hidden,description:d}}));let moves=await Promise.all(p.moves.slice(0,80).map(async e=>{let mr=await fetch(e.move.url);if(!mr.ok)return null;let m=await mr.json(),eff=m.effect_entries.find(x=>x.language.name==="en");return{name:m.name,type:m.type.name,category:m.damage_class.name,power:m.power,accuracy:m.accuracy,pp:m.pp,description:eff?eff.short_effect:""}}));let st={};p.stats.forEach(x=>st[x.stat.name]=x.base_stat);let flavor=sp.flavor_text_entries?.find(x=>x.language.name==="en"),genus=sp.genera?.find(x=>x.language.name==="en"),gr=sp.gender_rate,gender="Unknown";if(gr===-1)gender="Genderless";else if(gr!==undefined){let f=gr*12.5;gender=`Male ${(100-f).toFixed(1)}% / Female ${f.toFixed(1)}%`}let evo=[];try{let er=await fetch(sp.evolution_chain.url),ed=await er.json();flattenEvo(ed.chain,1,"Base form",evo)}catch{}let obj={id:p.id,name:p.name,displayName:title(p.name),artwork:p.sprites.other?.["official-artwork"]?.front_default||p.sprites.front_default,shiny:p.sprites.other?.["official-artwork"]?.front_shiny||p.sprites.front_shiny,types:p.types.map(x=>x.type.name),height:p.height,weight:p.weight,species:genus?.genus||"Unknown Pokémon",description:clean(flavor?.flavor_text||""),stats:{hp:st.hp||0,attack:st.attack||0,defense:st.defense||0,specialAttack:st["special-attack"]||0,specialDefense:st["special-defense"]||0,speed:st.speed||0},abilities,moves:moves.filter(Boolean),genderText:gender,hasGenderDifferences:sp.has_gender_differences||false,evolutionChain:evo};obj.role=roleOf(obj);return obj}
+function formatGeneration(genName){
+  const map={"generation-i":"Gen I","generation-ii":"Gen II","generation-iii":"Gen III","generation-iv":"Gen IV","generation-v":"Gen V","generation-vi":"Gen VI","generation-vii":"Gen VII","generation-viii":"Gen VIII","generation-ix":"Gen IX"};
+  return map[genName]||title(String(genName||"").replace("generation-","Gen "));
+}
+async function fetchPokemon(term){let r=await fetch(`${API_BASE}/pokemon/${norm(term)}`);if(!r.ok)throw Error("Pokémon not found.");let p=await r.json(),sr=await fetch(p.species.url),sp=sr.ok?await sr.json():{};let abilities=await Promise.all(p.abilities.map(async e=>{let d="No description available.";let ar=await fetch(e.ability.url);if(ar.ok){let a=await ar.json(),eff=a.effect_entries.find(x=>x.language.name==="en");if(eff)d=eff.short_effect}return{name:e.ability.name,hidden:e.is_hidden,description:d}}));let moves=await Promise.all(p.moves.slice(0,80).map(async e=>{let mr=await fetch(e.move.url);if(!mr.ok)return null;let m=await mr.json(),eff=m.effect_entries.find(x=>x.language.name==="en");return{name:m.name,type:m.type.name,category:m.damage_class.name,power:m.power,accuracy:m.accuracy,pp:m.pp,description:eff?eff.short_effect:""}}));let st={};p.stats.forEach(x=>st[x.stat.name]=x.base_stat);let flavor=sp.flavor_text_entries?.find(x=>x.language.name==="en"),genus=sp.genera?.find(x=>x.language.name==="en"),gr=sp.gender_rate,gender="Unknown";if(gr===-1)gender="Genderless";else if(gr!==undefined){let f=gr*12.5;gender=`Male ${(100-f).toFixed(1)}% / Female ${f.toFixed(1)}%`}let evo=[];try{let er=await fetch(sp.evolution_chain.url),ed=await er.json();flattenEvo(ed.chain,1,"Base form",evo)}catch{}let obj={id:p.id,name:p.name,displayName:title(p.name),artwork:p.sprites.other?.["official-artwork"]?.front_default||p.sprites.front_default,shiny:p.sprites.other?.["official-artwork"]?.front_shiny||p.sprites.front_shiny,types:p.types.map(x=>x.type.name),height:p.height,weight:p.weight,species:genus?.genus||"Unknown Pokémon",
+description:clean(flavor?.flavor_text||""),
+generation:sp.generation?formatGeneration(sp.generation.name):"Unknown",
+habitat:sp.habitat?title(sp.habitat.name):"Unknown",
+captureRate:sp.capture_rate??"Unknown",
+baseFriendship:sp.base_happiness??"Unknown",
+eggCycles:sp.hatch_counter??"Unknown",
+hatchSteps:sp.hatch_counter!==undefined?sp.hatch_counter*255:"Unknown",
+legendary:sp.is_legendary?"Yes":"No",
+mythical:sp.is_mythical?"Yes":"No",
+stats:{hp:st.hp||0,attack:st.attack||0,defense:st.defense||0,specialAttack:st["special-attack"]||0,specialDefense:st["special-defense"]||0,speed:st.speed||0},abilities,moves:moves.filter(Boolean),genderText:gender,hasGenderDifferences:sp.has_gender_differences||false,evolutionChain:evo};obj.role=roleOf(obj);return obj}
 function evoReq(d){d=d?.[0]||{};let p=[];if(d.min_level)p.push("Level "+d.min_level);if(d.item)p.push(title(d.item.name));if(d.trigger?.name==="trade")p.push("Trade");if(d.held_item)p.push("Hold "+title(d.held_item.name));return p.join(" + ")||"Special condition"}function flattenEvo(n,stage,req,out){out.push({name:n.species.name,stage,requirement:req});(n.evolves_to||[]).forEach(c=>flattenEvo(c,stage+1,evoReq(c.evolution_details),out))}
 async function runSearch(v){id("errorBox").classList.add("hidden");id("loading").classList.remove("hidden");try{render(await fetchPokemon(v))}catch(e){id("errorBox").textContent=e.message;id("errorBox").classList.remove("hidden")}finally{id("loading").classList.add("hidden")}}
 function render(p){currentPokemon=p;currentMoves=p.moves;id("officialArtwork").src=id("shinyToggle").checked&&p.shiny?p.shiny:p.artwork;id("pokemonName").textContent=p.displayName;id("dexNumber").textContent="#"+String(p.id).padStart(4,"0");id("typeBadges").innerHTML=p.types.map(badge).join("");id("species").textContent=p.species;id("height").textContent="Height: "+(p.height/10).toFixed(1)+" m";id("weight").textContent="Weight: "+(p.weight/10).toFixed(1)+" kg";renderDex(p);renderEvo(p);renderStats(p);renderAbilities(p);renderTypes(p);renderComp(p);renderForms(p);renderEV();renderCustom(p);renderMoves(p.moves);populateDamageMoves()}
-function renderDex(p){id("pokedexEntry").textContent=p.description||"No entry.";id("pokedexInfo").innerHTML=`<div class="mini-card"><b>Generation</b><p>Gen ${p.id<=151?"I":p.id<=251?"II":p.id<=386?"III":p.id<=493?"IV":"V+"}</p></div><div class="mini-card"><b>Species</b><p>${p.species}</p></div>`}function renderEvo(p){id("evolutionChain").innerHTML=p.evolutionChain.map((e,i)=>(i?`<div class="score-chip">↓ ${e.requirement}</div>`:"")+`<div class="mini-card"><b>${title(e.name)}</b><p>Stage ${e.stage}</p></div>`).join("")}
+function renderDex(p){
+  id("pokedexEntry").textContent=p.description||"No Pokédex entry available.";
+  id("pokedexInfo").innerHTML=`
+    <div class="mini-card"><b>Generation</b><p>${p.generation}</p></div>
+    <div class="mini-card"><b>Species</b><p>${p.species}</p></div>
+    <div class="mini-card"><b>Habitat</b><p>${p.habitat}</p></div>
+    <div class="mini-card"><b>Capture Rate</b><p>${p.captureRate}</p></div>
+    <div class="mini-card"><b>Base Friendship</b><p>${p.baseFriendship}</p></div>
+    <div class="mini-card"><b>Egg Cycles</b><p>${p.eggCycles}</p></div>
+    <div class="mini-card"><b>Hatch Steps</b><p>${p.hatchSteps}</p></div>
+    <div class="mini-card"><b>Legendary / Mythical</b><p>${p.legendary} / ${p.mythical}</p></div>
+  `;
+}
+function renderEvo(p){id("evolutionChain").innerHTML=p.evolutionChain.map((e,i)=>(i?`<div class="score-chip">↓ ${e.requirement}</div>`:"")+`<div class="mini-card"><b>${title(e.name)}</b><p>Stage ${e.stage}</p></div>`).join("")}
 function renderStats(p){let a=[["HP","hp"],["Attack","attack"],["Defense","defense"],["Sp. Atk","specialAttack"],["Sp. Def","specialDefense"],["Speed","speed"]];id("bst").textContent=a.reduce((s,[,k])=>s+p.stats[k],0);id("statsPanel").innerHTML=a.map(([l,k])=>`<div class="stat-row"><div class="stat-label"><span>${l}</span><span>${p.stats[k]}</span></div><div class="bar"><div class="fill" style="width:${Math.min(p.stats[k]/255*100,100)}%"></div></div></div>`).join("")}function renderAbilities(p){id("abilities").innerHTML=p.abilities.map(a=>`<div class="mini-card"><b>${title(a.name)}</b><p>${a.description}</p>${a.hidden?'<span class="score-chip">Hidden Ability</span>':''}</div>`).join("")}
 function list(a){return a.map(badge).join("")||"<em>None</em>"}function renderTypes(p){let m=matchup(p.types);id("typeMatchups").innerHTML=`<div class="matchup-box"><h3>4× Weak</h3>${list(m["4x"])}</div><div class="matchup-box"><h3>2× Weak</h3>${list(m["2x"])}</div><div class="matchup-box"><h3>½× Resist</h3>${list(m["0.5x"])}</div><div class="matchup-box"><h3>¼× Resist</h3>${list(m["0.25x"])}</div><div class="matchup-box"><h3>0× Immune</h3>${list(m["0x"])}</div>`}
 function renderComp(p){let hid=p.abilities.find(a=>a.hidden);id("competitivePanel").innerHTML=`<div class="matchups"><div class="mini-card"><b>Role</b><p>${p.role}</p></div><div class="mini-card"><b>Nature</b><p>${suggestNature(p)}</p></div><div class="mini-card"><b>Ability</b><p>${title((hid||p.abilities[0])?.name||"Unknown")}</p></div><div class="mini-card"><b>Item</b><p>${itemOf(p)}</p></div></div>`}function renderForms(p){id("formsPanel").innerHTML=`<div class="mini-card"><b>${p.displayName}</b>${p.types.map(badge).join("")}</div>`;let megas=MEGA[p.name]||[];id("megaPanel").innerHTML="<h3>Mega Evolutions</h3>"+(megas.length?megas.map(m=>`<div class="mini-card"><b>${m[0]}</b><p>Ability: ${m[2]}</p>${m[1].map(badge).join("")}</div>`).join(""):"<p>No official Mega Evolution.</p>");id("genderPanel").innerHTML=`<h3>Gender</h3><p>${p.genderText}</p>`}
@@ -103,7 +130,133 @@ async function suggest(inputId,boxId){
     box.classList.add("hidden");
   }
 }
-async function addOpponent(){try{opponentTeam.push(await fetchPokemon(id("opponentInput").value));id("opponentInput").value="";renderBattleTeams()}catch{alert("Could not load opponent")}}function renderBattleTeams(){id("battleYourTeam").innerHTML=team.length?team.map(p=>battleCard(p)).join(""):"Add Pokémon to your team first.";id("opponentTeamSlots").innerHTML=opponentTeam.length?opponentTeam.map((p,i)=>battleCard(p,`<button class="remove-btn" onclick="opponentTeam.splice(${i},1);renderBattleTeams()">Remove</button>`)).join(""):"No opponent Pokémon added yet."}function battleCard(p,extra=""){return`<div class="battle-team-card"><div class="battle-head"><img src="${p.artwork}"><div><b>${p.displayName}</b><div>${p.types.map(badge).join("")}</div><small>${p.role} · Speed ${p.ev?.finalStats?.speed||p.stats.speed}</small></div></div>${extra}</div>`}function bestMoveAgainst(a,d){let best=null;(a.moves||[]).filter(m=>m.power).forEach(m=>{let score=m.power*typeEffectiveness(m.type,d.types)*(a.types.includes(m.type)?1.5:1);if(!best||score>best.score)best={move:m,score,effectiveness:typeEffectiveness(m.type,d.types)}});return best}function analyzeBattle(){if(!team.length||!opponentTeam.length)return id("battlePlanResult").textContent="Add your team and opponent team first.";let threats=opponentTeam.map(o=>{let score=team.reduce((s,p)=>s+(bestMoveAgainst(o,p)?.effectiveness>=2?20:8)+(o.stats.speed>(p.ev?.finalStats?.speed||p.stats.speed)?10:0),0)/team.length;return{o,score:Math.round(score)}}).sort((a,b)=>b.score-a.score);id("battlePlanResult").innerHTML="<h3>Threat Rankings</h3>"+threats.map(t=>`<div class="mini-card"><b>${t.o.displayName}</b> <span class="score-chip">${t.score}/100</span><p>${t.o.types.map(badge).join("")}</p></div>`).join("")}function analyzeCores(){let types=new Set(team.flatMap(p=>p.types)),cores=[];if(types.has("fire")&&types.has("water")&&types.has("grass"))cores.push("Fire / Water / Grass");if(types.has("dragon")&&types.has("fairy")&&types.has("steel"))cores.push("Dragon / Fairy / Steel");id("teamCoreResult").innerHTML=cores.length?cores.map(c=>`<span class="score-chip">${c}</span>`).join(" "):"No major core detected yet."}
+async function addOpponent(){try{opponentTeam.push(await fetchPokemon(id("opponentInput").value));id("opponentInput").value="";renderBattleTeams()}catch{alert("Could not load opponent")}}function renderBattleTeams(){id("battleYourTeam").innerHTML=team.length?team.map(p=>battleCard(p)).join(""):"Add Pokémon to your team first.";id("opponentTeamSlots").innerHTML=opponentTeam.length?opponentTeam.map((p,i)=>battleCard(p,`<button class="remove-btn" onclick="opponentTeam.splice(${i},1);renderBattleTeams()">Remove</button>`)).join(""):"No opponent Pokémon added yet."}function battleCard(p,extra=""){return`<div class="battle-team-card"><div class="battle-head"><img src="${p.artwork}"><div><b>${p.displayName}</b><div>${p.types.map(badge).join("")}</div><small>${p.role} · Speed ${p.ev?.finalStats?.speed||p.stats.speed}</small></div></div>${extra}</div>`}function bestMoveAgainst(a,d){let best=null;(a.moves||[]).filter(m=>m.power).forEach(m=>{let score=m.power*typeEffectiveness(m.type,d.types)*(a.types.includes(m.type)?1.5:1);if(!best||score>best.score)best={move:m,score,effectiveness:typeEffectiveness(m.type,d.types)}});return best}
+function topMoveInto(attacker, defender){
+  let best=null;
+  (attacker.moves||[]).filter(m=>m.power).slice(0,80).forEach(m=>{
+    const eff=typeEffectiveness(m.type,defender.types);
+    const stab=attacker.types.includes(m.type)?1.5:1;
+    const score=(m.power||0)*eff*stab;
+    if(!best||score>best.score)best={move:m,score,effectiveness:eff,stab};
+  });
+  return best;
+}
+function threatBreakdown(opponent){
+  if(!team.length)return {overall:0,speed:0,coverage:0,defense:0,switchPressure:0,core:0,reasons:[],vulnerable:[]};
+  const oppSpeed=opponent.stats.speed;
+  const slower=team.filter(p=>oppSpeed>(p.ev?.finalStats?.speed||p.stats.speed)).length;
+  const speed=Math.round((slower/team.length)*100);
+  let superHits=0, neutralHits=0, vulnerable=[];
+  team.forEach(p=>{
+    const bm=topMoveInto(opponent,p);
+    if(bm){
+      if(bm.effectiveness>1){superHits++; vulnerable.push(`${p.displayName} hit by ${title(bm.move.name)} (${bm.effectiveness}×)`);}
+      else if(bm.effectiveness===1) neutralHits++;
+    }
+  });
+  const coverage=Math.min(100,Math.round((superHits/team.length)*80+(neutralHits/team.length)*25));
+  let safeSwitches=team.filter(p=>{
+    const bm=topMoveInto(opponent,p);
+    return bm && bm.effectiveness<1;
+  }).length;
+  const switchPressure=Math.max(0,Math.round(100-(safeSwitches/team.length)*100));
+  let defense=0;
+  team.forEach(p=>{
+    const ourBest=topMoveInto(p,opponent);
+    if(!ourBest||ourBest.effectiveness<=1) defense+=1;
+  });
+  defense=Math.round((defense/team.length)*100);
+  const coreTypes=new Set(team.flatMap(p=>p.types));
+  let core=0;
+  opponent.types.forEach(t=>{ if(coreTypes.has(t)) core+=20; });
+  core=Math.min(100,core+superHits*8);
+  const overall=Math.round(speed*.25+coverage*.25+defense*.20+switchPressure*.15+core*.15);
+  const reasons=[];
+  if(slower) reasons.push(`Faster than ${slower} of your Pokémon.`);
+  if(superHits) reasons.push(`Has super-effective coverage into ${superHits} team member(s).`);
+  if(safeSwitches===0) reasons.push("No obvious resistance-based safe switch detected.");
+  else reasons.push(`${safeSwitches} possible resistance-based switch option(s).`);
+  if(["Physical Sweeper","Special Sweeper","Fast Utility"].includes(opponent.role)) reasons.push(`Role profile increases pressure: ${opponent.role}.`);
+  return {overall,speed,coverage,defense,switchPressure,core,reasons,vulnerable};
+}
+function bestLeadOptions(){
+  return team.map(p=>{
+    let score=0,reasons=[];
+    opponentTeam.forEach(o=>{
+      const bm=topMoveInto(p,o);
+      if(bm?.effectiveness>1){score+=20;reasons.push(`${title(bm.move.name)} pressures ${o.displayName}.`);}
+      const their=topMoveInto(o,p);
+      if(their?.effectiveness<1){score+=10;reasons.push(`Resists likely pressure from ${o.displayName}.`);}
+      if((p.ev?.finalStats?.speed||p.stats.speed)>=o.stats.speed)score+=5;
+    });
+    return {pokemon:p,score,reasons:[...new Set(reasons)].slice(0,3)};
+  }).sort((a,b)=>b.score-a.score).slice(0,3);
+}
+function safeSwitchIdeas(topThreat){
+  if(!topThreat)return [];
+  return team.map(p=>{
+    const bm=topMoveInto(topThreat,p);
+    let score=0,reasons=[];
+    if(bm){
+      if(bm.effectiveness===0){score+=40;reasons.push(`Immune to ${title(bm.move.type)} pressure.`);}
+      else if(bm.effectiveness<1){score+=25;reasons.push(`Resists likely ${title(bm.move.name)} pressure.`);}
+      else if(bm.effectiveness===1){score+=8;reasons.push(`Takes neutral damage from estimated best move.`);}
+      else {score-=15;reasons.push(`Weak to estimated ${title(bm.move.name)} pressure.`);}
+    }
+    if(["Defensive Tank","Wall","Bulky Support"].includes(p.role)){score+=15;reasons.push(`Defensive role: ${p.role}.`);}
+    return {pokemon:p,score,reasons};
+  }).sort((a,b)=>b.score-a.score).slice(0,3);
+}
+function winConditionIdeas(){
+  return team.filter(p=>["Physical Sweeper","Special Sweeper","Fast Utility"].includes(p.role)).map(p=>{
+    let hits=opponentTeam.filter(o=>topMoveInto(p,o)?.effectiveness>1).length;
+    return {pokemon:p,hits,reason:`Can pressure ${hits} opponent(s) super effectively.`};
+  }).sort((a,b)=>b.hits-a.hits).slice(0,3);
+}
+
+function analyzeBattle(){
+  if(!team.length||!opponentTeam.length){
+    id("battlePlanResult").textContent="Add your team and opponent team first.";
+    return;
+  }
+  const threats=opponentTeam.map(o=>({pokemon:o,breakdown:threatBreakdown(o)})).sort((a,b)=>b.breakdown.overall-a.breakdown.overall);
+  const leads=bestLeadOptions();
+  const switches=safeSwitchIdeas(threats[0]?.pokemon);
+  const wins=winConditionIdeas();
+
+  id("battlePlanResult").innerHTML=`
+    <h3>Threat Rankings</h3>
+    ${threats.map((t,i)=>{
+      const b=t.breakdown;
+      const label=b.overall>=75?"HIGH THREAT":b.overall>=50?"MEDIUM THREAT":"LOW THREAT";
+      return `<div class="mini-card">
+        <h3>${i+1}. ${t.pokemon.displayName} <span class="score-chip">${label}: ${b.overall}/100</span></h3>
+        <div>${t.pokemon.types.map(badge).join("")}</div>
+        <div class="matchups">
+          <div class="mini-card"><b>Speed Threat</b><p>${b.speed}/100</p></div>
+          <div class="mini-card"><b>Coverage Threat</b><p>${b.coverage}/100</p></div>
+          <div class="mini-card"><b>Defensive Difficulty</b><p>${b.defense}/100</p></div>
+          <div class="mini-card"><b>Safe Switch Pressure</b><p>${b.switchPressure}/100</p></div>
+          <div class="mini-card"><b>Core Pressure</b><p>${b.core}/100</p></div>
+        </div>
+        <h4>Why this Pokémon is dangerous</h4>
+        <ul>${b.reasons.map(r=>`<li>${r}</li>`).join("")}</ul>
+        <h4>Most Vulnerable</h4>
+        ${b.vulnerable.length?`<ul>${b.vulnerable.slice(0,5).map(v=>`<li>${v}</li>`).join("")}</ul>`:"<p>No major vulnerable matchup detected.</p>"}
+      </div>`;
+    }).join("")}
+
+    <h3>Recommended Leads</h3>
+    ${leads.map(l=>`<div class="mini-card"><b>${l.pokemon.displayName}</b> <span class="score-chip">Lead Score: ${l.score}</span><div>${l.pokemon.types.map(badge).join("")}</div><ul>${l.reasons.length?l.reasons.map(r=>`<li>${r}</li>`).join(""):"<li>Balanced opening option.</li>"}</ul></div>`).join("")}
+
+    <h3>Safe Switch Ideas vs ${threats[0]?.pokemon.displayName}</h3>
+    ${switches.map(s=>`<div class="mini-card"><b>${s.pokemon.displayName}</b> <span class="score-chip">Switch Score: ${Math.round(s.score)}</span><div>${s.pokemon.types.map(badge).join("")}</div><ul>${s.reasons.map(r=>`<li>${r}</li>`).join("")}</ul></div>`).join("")}
+
+    <h3>Win Condition Ideas</h3>
+    ${wins.length?wins.map(w=>`<div class="mini-card"><b>${w.pokemon.displayName}</b><p>${w.reason}</p></div>`).join(""):"<p>No clear offensive win condition detected yet.</p>"}
+  `;
+}
+function analyzeCores(){let types=new Set(team.flatMap(p=>p.types)),cores=[];if(types.has("fire")&&types.has("water")&&types.has("grass"))cores.push("Fire / Water / Grass");if(types.has("dragon")&&types.has("fairy")&&types.has("steel"))cores.push("Dragon / Fairy / Steel");id("teamCoreResult").innerHTML=cores.length?cores.map(c=>`<span class="score-chip">${c}</span>`).join(" "):"No major core detected yet."}
 document.addEventListener("DOMContentLoaded",()=>{setupNature();id("themeToggle").onclick=()=>{document.body.classList.toggle("light");id("themeToggle").textContent=document.body.classList.contains("light")?"🌙 Dark":"☀️ Light"};id("shinyToggle").onchange=()=>{id("shinyStatus").textContent=id("shinyToggle").checked?"ON":"OFF";if(currentPokemon)id("officialArtwork").src=id("shinyToggle").checked&&currentPokemon.shiny?currentPokemon.shiny:currentPokemon.artwork};id("searchButton").onclick=()=>runSearch(id("pokemonSearch").value);id("pokemonSearch").onkeydown=e=>{if(e.key==="Enter")runSearch(id("pokemonSearch").value)};id("pokemonSearch").oninput=()=>suggest("pokemonSearch","suggestions");id("opponentInput").oninput=()=>suggest("opponentInput","opponentSuggestions");id("addTeamBtn").onclick=addToTeam;id("clearTeamBtn").onclick=()=>{team=[];renderTeam()};id("saveTeamBtn").onclick=()=>localStorage.setItem("team",JSON.stringify(team.map(p=>p.name)));id("loadTeamBtn").onclick=async()=>{let names=JSON.parse(localStorage.getItem("team")||"[]");team=[];for(let n of names)team.push(await fetchPokemon(n));renderTeam()};["calcLevel","natureSelect","evHP","evAttack","evDefense","evSpA","evSpD","evSpeed"].forEach(x=>id(x).oninput=()=>currentPokemon&&renderEV());id("resetEvBtn").onclick=()=>{["evHP","evAttack","evDefense","evSpA","evSpD","evSpeed"].forEach(x=>id(x).value=0);id("calcLevel").value=50;renderEV()};id("moveSearch").oninput=applyMoveFilters;id("typeFilter").onchange=applyMoveFilters;id("categoryFilter").onchange=applyMoveFilters;id("loadDefenderBtn").onclick=loadDefender;id("calculateDamageBtn").onclick=calcDamage;id("addOpponentBtn").onclick=addOpponent;id("clearOpponentBtn").onclick=()=>{opponentTeam=[];renderBattleTeams()};id("analyzeBattleBtn").onclick=analyzeBattle;id("analyzeCoreBtn").onclick=analyzeCores;runSearch("charizard");renderTeam()});
 </script>
 </body>
