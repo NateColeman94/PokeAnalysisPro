@@ -1,32 +1,13 @@
-# PokéAnalysis Sprint 5.8D Gold Build
+# PokéAnalysis Sprint 5.8.1 Gold Move Patch
 
 Upload only:
 - index.html
 - README.md
 
-Built from the working Sprint 5.8B version.
-
-Kept from 5.8B:
-- Full Pokédex panel
-- Complete Competitive Analysis
-- Threat Score / Battle Planner intelligence
-- Team Core Analyzer 3.0
-- Team grades
-- Weakness heat map
-- Speed tier report
-- Win condition finder
-- AI Coach notes
-- Competitive Mode selector
-- Full official Mega Evolution database
-- Theme toggle fix
-- Shiny toggle fix
-- Autocomplete fix
-- Damage Calculator fix
-- No export section
-
-Added:
-- Held item dropdown
-- Custom Item option
-- Recommended item auto-selection
-- Ability dropdown preserved
-- Single-file upload format preserved
+Changes:
+- Move Database moved directly after Competitive Analysis.
+- Added selected move dropdowns for Move 1, Move 2, Move 3, and Move 4.
+- Selected moves are saved when adding Pokémon to Team Builder.
+- Team cards now show selected moves.
+- Team analysis and Battle Planner use the selected moves when available.
+- Keeps 5.8D Gold Build features and held item dropdown.

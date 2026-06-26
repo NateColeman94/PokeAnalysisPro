@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>PokéAnalysis Sprint 5.8D Gold Build</title>
+<title>PokéAnalysis Sprint 5.8.1 Gold Move Patch</title>
 <style>
 :root{--bg:#07111f;--panel:#0e1b2d;--panel2:#111f33;--line:#26364d;--text:#f6f8ff;--muted:#aab6c7;--purple:#6b38e8;--green:#5fd16d;--red:#ff5d5d;--yellow:#ffcb05}
 body.light{--bg:#eef3fb;--panel:#fff;--panel2:#f4f7fb;--line:#cdd8e8;--text:#172033;--muted:#5d6a7d}
@@ -44,14 +44,16 @@ footer{text-align:center;margin:25px 0}
 #customItemTextWrap.hidden{display:none!important}
 #customItem{min-width:220px}
 
+
+#selectedMove1,#selectedMove2,#selectedMove3,#selectedMove4{min-width:180px}
 </style>
 </head>
 <body>
 <div class="app">
 <aside class="sidebar">
-<div class="brand">⚪ PokéAnalysis<span>Pro</span></div><p>Sprint 5.8D Gold Build</p>
+<div class="brand">⚪ PokéAnalysis<span>Pro</span></div><p>Sprint 5.8.1 Gold Move Patch</p>
 <nav>
-<a href="#overview" class="active">Pokémon Overview</a><a href="#pokedex">Pokédex Entry</a><a href="#evolution">Evolution Chain</a><a href="#stats">Base Stats</a><a href="#typeEffect">Type Effectiveness</a><a href="#competitive">Competitive Analysis</a><a href="#evBuilder">EV + Nature Builder</a><a href="#damage">Damage Calculator</a><a href="#battle">Battle Planner</a><a href="#core">Team Core Analyzer</a><a href="#teamBuilder">Team Builder</a><a href="#moves">Move Database</a>
+<a href="#overview" class="active">Pokémon Overview</a><a href="#pokedex">Pokédex Entry</a><a href="#evolution">Evolution Chain</a><a href="#stats">Base Stats</a><a href="#typeEffect">Type Effectiveness</a><a href="#competitive">Competitive Analysis</a><a href="#moves">Move Database</a><a href="#evBuilder">EV + Nature Builder</a><a href="#damage">Damage Calculator</a><a href="#battle">Battle Planner</a><a href="#core">Team Core Analyzer</a><a href="#teamBuilder">Team Builder</a>
 </nav>
 </aside>
 <main class="main">
@@ -66,6 +68,18 @@ footer{text-align:center;margin:25px 0}
 <section class="grid two-col" id="stats"><article class="card"><h2>Base Stats</h2><div id="statsPanel"></div><h3>Total <span id="bst">0</span></h3></article><article class="card"><h2>Abilities</h2><div id="abilities"></div></article></section>
 <section class="card" id="typeEffect"><h2>Type Effectiveness</h2><div id="typeMatchups" class="matchups"></div></section>
 <section class="grid two-col"><article class="card" id="competitive"><h2>Competitive Analysis</h2><div id="competitivePanel"></div></article><article class="card"><h2>Forms, Mega & Gender</h2><div id="formsPanel"></div><div id="megaPanel"></div><div id="genderPanel"></div></article></section>
+<section class="grid move-grid" id="moves"><article class="card"><h2>Move Database</h2><div class="custom-grid custom-grid-small"><input id="moveSearch" placeholder="Search moves..."><select id="typeFilter"><option value="">All Types</option></select><select id="categoryFilter"><option value="">All Categories</option></select></div>
+        <h3>Selected Moves for Team Builder</h3>
+        <p class="muted">Choose up to four moves for this Pokémon. These will be saved when you click Add to Team.</p>
+        <div class="custom-grid">
+          <label>Move 1 <select id="selectedMove1"></select></label>
+          <label>Move 2 <select id="selectedMove2"></select></label>
+          <label>Move 3 <select id="selectedMove3"></select></label>
+          <label>Move 4 <select id="selectedMove4"></select></label>
+        </div>
+
+        <div class="table-wrap"><table><thead><tr><th>Move</th><th>Type</th><th>Category</th><th>Power</th><th>Accuracy</th><th>PP</th></tr></thead><tbody id="movesBody"></tbody></table></div></article><article class="card"><h2>Move Details</h2><div id="moveDetails">Select a move to view details.</div></article></section>
+
 <section class="card" id="evBuilder"><h2>EV + Nature Builder</h2><div class="custom-grid custom-grid-small"><label>Level<input id="calcLevel" type="number" min="1" max="100" value="50"></label><label>Nature<select id="natureSelect"></select></label><button id="resetEvBtn">Reset EV Builder</button></div><h3>EVs</h3><div class="custom-grid"><label>HP EV<input id="evHP" type="number" min="0" max="252" value="0"></label><label>Attack EV<input id="evAttack" type="number" min="0" max="252" value="0"></label><label>Defense EV<input id="evDefense" type="number" min="0" max="252" value="0"></label><label>Sp. Attack EV<input id="evSpA" type="number" min="0" max="252" value="0"></label><label>Sp. Defense EV<input id="evSpD" type="number" min="0" max="252" value="0"></label><label>Speed EV<input id="evSpeed" type="number" min="0" max="252" value="0"></label></div><div id="evWarning" class="bad"></div><div id="finalStatsPanel" class="final-stats-grid"></div></section>
 <section class="card"><h2>Team Build Options</h2><div class="custom-grid custom-grid-small"><label>Selected Ability<select id="customAbility"></select></label><label>Held Item<select id="customItem"><option value="Leftovers">Leftovers</option><option value="Heavy-Duty Boots">Heavy-Duty Boots</option><option value="Life Orb">Life Orb</option><option value="Choice Band">Choice Band</option><option value="Choice Specs">Choice Specs</option><option value="Choice Scarf">Choice Scarf</option><option value="Focus Sash">Focus Sash</option><option value="Assault Vest">Assault Vest</option><option value="Rocky Helmet">Rocky Helmet</option><option value="Black Sludge">Black Sludge</option><option value="Sitrus Berry">Sitrus Berry</option><option value="Lum Berry">Lum Berry</option><option value="Air Balloon">Air Balloon</option><option value="Expert Belt">Expert Belt</option><option value="Weakness Policy">Weakness Policy</option><option value="Eviolite">Eviolite</option><option value="Light Clay">Light Clay</option><option value="Booster Energy">Booster Energy</option><option value="Loaded Dice">Loaded Dice</option><option value="Covert Cloak">Covert Cloak</option><option value="Clear Amulet">Clear Amulet</option><option value="Punching Glove">Punching Glove</option><option value="Throat Spray">Throat Spray</option><option value="Terrain Extender">Terrain Extender</option><option value="Damp Rock">Damp Rock</option><option value="Heat Rock">Heat Rock</option><option value="Smooth Rock">Smooth Rock</option><option value="Icy Rock">Icy Rock</option><option value="Mystic Water">Mystic Water</option><option value="Charcoal">Charcoal</option><option value="Miracle Seed">Miracle Seed</option><option value="Magnet">Magnet</option><option value="Never-Melt Ice">Never-Melt Ice</option><option value="Black Belt">Black Belt</option><option value="Poison Barb">Poison Barb</option><option value="Soft Sand">Soft Sand</option><option value="Sharp Beak">Sharp Beak</option><option value="Twisted Spoon">Twisted Spoon</option><option value="Silver Powder">Silver Powder</option><option value="Hard Stone">Hard Stone</option><option value="Spell Tag">Spell Tag</option><option value="Dragon Fang">Dragon Fang</option><option value="Black Glasses">Black Glasses</option><option value="Metal Coat">Metal Coat</option><option value="Pixie Plate">Pixie Plate</option><option value="Custom Item">Custom Item</option></select></label><label id="customItemTextWrap" class="hidden">Custom Item<input id="customItemText" placeholder="Type custom item"></label></div></section>
 <section class="card" id="damage"><h2>Damage Calculator</h2><div class="custom-grid custom-grid-small"><label>Attacker Move<select id="damageMoveSelect"></select></label><label>Defender Pokémon<input id="defenderSearch" placeholder="e.g. scizor"></label><label>Defender Level<input id="defenderLevel" type="number" min="1" max="100" value="50"></label><button id="loadDefenderBtn">Load Defender</button></div><div class="custom-grid custom-grid-small"><label>Weather<select id="weatherSelect"><option value="">None</option><option value="sun">Sun</option><option value="rain">Rain</option></select></label><label>Screen<select id="screenSelect"><option value="">None</option><option value="reflect">Reflect</option><option value="light-screen">Light Screen</option></select></label><label>Critical Hit<select id="critSelect"><option value="">No</option><option value="crit">Yes</option></select></label><button id="calculateDamageBtn">Calculate Damage</button></div><div id="defenderPanel" class="mini-card">No defender loaded yet.</div><div id="damageResult" class="damage-result">Choose a move, load a defender, then calculate damage.</div></section>
@@ -73,8 +87,8 @@ footer{text-align:center;margin:25px 0}
 <section class="card" id="core"><h2>Team Core Analyzer 3.0</h2><button id="analyzeCoreBtn">Analyze Team Cores</button><div id="teamCoreResult" class="battle-plan-result">Add Pokémon to your team, then click Analyze Team Cores for grades, heat map, speed tiers, support profile, and coach notes.</div></section>
 <section class="card" id="teamBuilder"><div style="display:flex;justify-content:space-between"><h2>Team Builder</h2><span id="teamCount" class="score-chip">0 / 6</span></div><div id="teamSlots" class="team-grid"></div><div class="team-buttons"><button id="clearTeamBtn">Clear Team</button><button id="saveTeamBtn">Save Team</button><button id="loadTeamBtn">Load Saved Team</button></div></section>
 <section class="grid analysis-grid"><article class="card"><h2>Advanced Team Score</h2><div id="teamScore" class="big-score">—</div><div id="teamSummary"></div></article><article class="card"><h2>Defensive Coverage</h2><div id="teamWeaknesses"></div></article><article class="card"><h2>Type Coverage & Speed</h2><div id="teamStats"></div></article><article class="card"><h2>Role Balance & Suggestions</h2><div id="teamRoles"></div></article></section>
-<section class="grid move-grid" id="moves"><article class="card"><h2>Move Database</h2><div class="custom-grid custom-grid-small"><input id="moveSearch" placeholder="Search moves..."><select id="typeFilter"><option value="">All Types</option></select><select id="categoryFilter"><option value="">All Categories</option></select></div><div class="table-wrap"><table><thead><tr><th>Move</th><th>Type</th><th>Category</th><th>Power</th><th>Accuracy</th><th>PP</th></tr></thead><tbody id="movesBody"></tbody></table></div></article><article class="card"><h2>Move Details</h2><div id="moveDetails">Select a move to view details.</div></article></section>
-<footer>PokéAnalysis Sprint 5.8D Gold Build · Data from PokéAPI</footer>
+
+<footer>PokéAnalysis Sprint 5.8.1 Gold Move Patch · Data from PokéAPI</footer>
 </main></div>
 <script>
 const API_BASE="https://pokeapi.co/api/v2";
@@ -106,7 +120,7 @@ mythical:sp.is_mythical?"Yes":"No",
 stats:{hp:st.hp||0,attack:st.attack||0,defense:st.defense||0,specialAttack:st["special-attack"]||0,specialDefense:st["special-defense"]||0,speed:st.speed||0},abilities,moves:moves.filter(Boolean),genderText:gender,hasGenderDifferences:sp.has_gender_differences||false,evolutionChain:evo};obj.role=roleOf(obj);return obj}
 function evoReq(d){d=d?.[0]||{};let p=[];if(d.min_level)p.push("Level "+d.min_level);if(d.item)p.push(title(d.item.name));if(d.trigger?.name==="trade")p.push("Trade");if(d.held_item)p.push("Hold "+title(d.held_item.name));return p.join(" + ")||"Special condition"}function flattenEvo(n,stage,req,out){out.push({name:n.species.name,stage,requirement:req});(n.evolves_to||[]).forEach(c=>flattenEvo(c,stage+1,evoReq(c.evolution_details),out))}
 async function runSearch(v){id("errorBox").classList.add("hidden");id("loading").classList.remove("hidden");try{render(await fetchPokemon(v))}catch(e){id("errorBox").textContent=e.message;id("errorBox").classList.remove("hidden")}finally{id("loading").classList.add("hidden")}}
-function render(p){currentPokemon=p;currentMoves=p.moves;id("officialArtwork").src=id("shinyToggle").checked&&p.shiny?p.shiny:p.artwork;id("pokemonName").textContent=p.displayName;id("dexNumber").textContent="#"+String(p.id).padStart(4,"0");id("typeBadges").innerHTML=p.types.map(badge).join("");id("species").textContent=p.species;id("height").textContent="Height: "+(p.height/10).toFixed(1)+" m";id("weight").textContent="Weight: "+(p.weight/10).toFixed(1)+" kg";renderDex(p);renderEvo(p);renderStats(p);renderAbilities(p);renderTypes(p);renderComp(p);renderForms(p);renderEV();renderCustom(p);renderMoves(p.moves);populateDamageMoves()}
+function render(p){currentPokemon=p;currentMoves=p.moves;id("officialArtwork").src=id("shinyToggle").checked&&p.shiny?p.shiny:p.artwork;id("pokemonName").textContent=p.displayName;id("dexNumber").textContent="#"+String(p.id).padStart(4,"0");id("typeBadges").innerHTML=p.types.map(badge).join("");id("species").textContent=p.species;id("height").textContent="Height: "+(p.height/10).toFixed(1)+" m";id("weight").textContent="Weight: "+(p.weight/10).toFixed(1)+" kg";renderDex(p);renderEvo(p);renderStats(p);renderAbilities(p);renderTypes(p);renderComp(p);renderForms(p);renderEV();renderCustom(p);renderMoves(p.moves);populateSelectedMoveDropdowns();populateDamageMoves()}
 function renderDex(p){
   id("pokedexEntry").textContent=p.description||"No Pokédex entry available.";
   id("pokedexInfo").innerHTML=`
@@ -435,7 +449,7 @@ function generateBattlePlanSteps(){
 }
 
 
-/* ===== Sprint 5.8D Gold Build Patch: Item Dropdown Without Feature Regression ===== */
+/* ===== Sprint 5.8.1 Gold Move Patch Patch: Item Dropdown Without Feature Regression ===== */
 function getSelectedHeldItem(){
   const itemEl=id("customItem");
   const customEl=id("customItemText");
@@ -493,6 +507,66 @@ if(originalAddToTeamGold){
   };
 }
 document.addEventListener("DOMContentLoaded", wireItemDropdownGold);
+
+
+/* ===== Sprint 5.8.1 Move Selection Patch ===== */
+function populateSelectedMoveDropdowns(){
+  if(!currentPokemon) return;
+  const moves=(currentPokemon.moves||[]).filter(m=>m.power || m.category==="status");
+  const sorted=[...moves].sort((a,b)=>{
+    const ap=a.power||0,bp=b.power||0;
+    if(bp!==ap) return bp-ap;
+    return a.name.localeCompare(b.name);
+  });
+  const options='<option value="">-- Select Move --</option>'+sorted.map(m=>`<option value="${m.name}">${title(m.name)} (${title(m.type)}${m.power?`, ${m.power} BP`:`, Status`})</option>`).join("");
+  ["selectedMove1","selectedMove2","selectedMove3","selectedMove4"].forEach((idName,idx)=>{
+    const el=id(idName);
+    if(el){
+      el.innerHTML=options;
+      const defaultMove=sorted[idx]?.name||"";
+      el.value=defaultMove;
+    }
+  });
+}
+function getSelectedMovesForTeam(){
+  const chosen=["selectedMove1","selectedMove2","selectedMove3","selectedMove4"]
+    .map(x=>id(x)?.value||"")
+    .filter(Boolean);
+  const unique=[...new Set(chosen)];
+  return unique.map(name=>(currentPokemon.moves||[]).find(m=>m.name===name)).filter(Boolean);
+}
+function selectedMovesDisplay(moves){
+  return (moves&&moves.length)?moves.map(m=>`<small>• ${title(m.name)} (${title(m.type)})</small>`).join("<br>"):"<small>No selected moves saved.</small>";
+}
+const originalRenderMovesGoldPatch = typeof renderMoves==="function" ? renderMoves : null;
+if(originalRenderMovesGoldPatch){
+  renderMoves=function(m){
+    originalRenderMovesGoldPatch(m);
+    populateSelectedMoveDropdowns();
+  };
+}
+const previousAddToTeamMovePatch = typeof addToTeam==="function" ? addToTeam : null;
+addToTeam=function(){
+  if(!currentPokemon)return;
+  if(team.length>=6)return alert("Team full");
+  let p=JSON.parse(JSON.stringify(currentPokemon));
+  p.customAbility=id("customAbility")?.value || p.abilities?.[0]?.name || "";
+  if(typeof getSelectedHeldItem==="function") p.heldItem=getSelectedHeldItem();
+  else p.heldItem=id("customItem")?.value || (typeof itemOf==="function"?itemOf(p):"Leftovers");
+  p.ev=typeof renderEV==="function" ? renderEV() : null;
+  p.role=typeof roleOf==="function" ? roleOf(p) : p.role;
+  p.selectedMoves=getSelectedMovesForTeam();
+  if(p.selectedMoves.length) p.moves=p.selectedMoves;
+  team.push(p);
+  renderTeam();
+};
+const previousRenderTeamMovePatch = typeof renderTeam==="function" ? renderTeam : null;
+renderTeam=function(){
+  id("teamCount").textContent=`${team.length} / 6`;
+  id("teamSlots").innerHTML=team.map((p,i)=>`<div class="team-slot"><img src="${p.artwork}"><h3>${p.displayName}</h3>${p.types.map(badge).join("")}<p>${p.role}</p><small>Ability: ${title(p.customAbility||"")}</small><br><small>Item: ${p.heldItem||"None"}</small><br><small>Nature: ${p.ev?.nature||"Serious"}</small><br><b>Moves</b><br>${selectedMovesDisplay(p.selectedMoves||p.moves)}<br><button class="remove-btn" onclick="team.splice(${i},1);renderTeam()">Remove</button></div>`).join("")||"<p class='muted'>No Pokémon on the team yet.</p>";
+  renderTeamAnalysis();
+  renderBattleTeams();
+};
 
 </script>
 </body>
