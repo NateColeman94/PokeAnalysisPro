@@ -1,15 +1,21 @@
-# Sprint 5.7.1 – Threat Score Rebuild
+# PokéAnalysis Fixed Single File Build
 
-Changes:
-- Threat Score 2.0 model
-- Overall Threat Score (0-100)
-- Speed Threat component
-- Coverage Threat component
-- Defensive Pressure component
-- Safe Switch Pressure component
-- Team Vulnerability section
-- Threat Ranking list
-- "Why this Pokémon is Dangerous" explanations
-- Improved Battle Planner outputs
+This version keeps the current features but removes the need to upload JavaScript files separately.
 
-This sprint is intended as a full replacement build on top of Sprint 5.7.
+## Upload
+Upload only:
+- index.html
+- README.md
+
+No js folder is required.
+No css folder is required.
+
+## Fixes included
+- Export section removed
+- Dark/light toggle fixed
+- Shiny toggle updates immediately
+- Attacker level defaults to 50
+- Defender level defaults to 50
+- Opponent Pokémon autocomplete fixed
+- Opponent team card sizing improved
+- Damage calculator buttons re-wired
